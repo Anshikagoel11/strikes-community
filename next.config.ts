@@ -4,7 +4,10 @@ const nextConfig: NextConfig = {
     /* config options here */
     reactCompiler: true,
     images: {
-        domains: ["uploadthing.com", "z4hrk2n1pd.ufs.sh"],
+        remotePatterns: [
+            { hostname: "uploadthing.com" },
+            { hostname: "z4hrk2n1pd.ufs.sh" },
+        ],
     },
 };
 

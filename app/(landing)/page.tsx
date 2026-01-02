@@ -4,11 +4,10 @@ import { Navbar } from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { motion } from "motion/react";
-import { Download, Globe, Shield, Sparkles, Users, Zap, LayoutDashboard, Twitter, Instagram, Facebook, Youtube } from "lucide-react";
-import { SignedIn, SignedOut, useAuth } from "@clerk/nextjs";
+import { Globe, Shield, Sparkles, Users, Zap, LayoutDashboard, Twitter, Instagram, Facebook, Youtube, LucideLayoutDashboard, LayoutDashboardIcon } from "lucide-react";
+import { SignedIn, SignedOut } from "@clerk/nextjs";
 
 export default function Home() {
-  const { userId } = useAuth();
   const fadeInUp = {
     initial: { opacity: 0, y: 20 },
     animate: { opacity: 1, y: 0 },
@@ -51,8 +50,8 @@ export default function Home() {
                   <Link href="/sign-up">
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                       <Button size="lg" className="h-14 px-8 text-lg bg-primary text-primary-foreground hover:bg-primary/90 rounded-full shadow-lg shadow-primary/25 w-full sm:w-auto">
-                        <Download className="mr-2 h-5 w-5" />
-                        Download for Linux
+                        <LayoutDashboardIcon className="mr-2 h-5 w-5" />
+                        Create Account
                       </Button>
                     </motion.div>
                   </Link>
@@ -65,7 +64,7 @@ export default function Home() {
                   </Link>
                 </SignedOut>
                 <SignedIn>
-                  <Link href={`/${userId}`}>
+                  <Link href={`/setup`}>
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                       <Button size="lg" className="h-14 px-8 text-lg bg-primary text-primary-foreground hover:bg-primary/90 rounded-full shadow-lg shadow-primary/25 w-full sm:w-auto">
                         <LayoutDashboard className="mr-2 h-5 w-5" />
@@ -207,13 +206,13 @@ export default function Home() {
               <SignedOut>
                 <Link href="/sign-up">
                   <Button size="lg" className="h-12 px-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full mt-4">
-                    <Download className="mr-2 h-4 w-4" />
-                    Download for Linux
+                    <LucideLayoutDashboard className="mr-2 h-4 w-4" />
+                    Create Account
                   </Button>
                 </Link>
               </SignedOut>
               <SignedIn>
-                <Link href={`/${userId}`}>
+                <Link href={`/setup`}>
                   <Button size="lg" className="h-12 px-8 bg-primary text-primary-foreground hover:bg-primary/90 rounded-full mt-4">
                     <LayoutDashboard className="mr-2 h-4 w-4" />
                     Go to Dashboard
