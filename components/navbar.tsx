@@ -2,7 +2,7 @@
 
 import { ModeToggle } from "@/components/ModeToggle";
 import { Button } from "@/components/ui/button";
-import { SignedIn, SignedOut, UserButton, useAuth } from "@clerk/nextjs";
+import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { Menu } from "lucide-react";
 import { motion } from "motion/react";
@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export const Navbar = () => {
-    const { userId } = useAuth();
 
     return (
         <nav className="fixed top-0 w-full z-50 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
@@ -32,7 +31,7 @@ export const Navbar = () => {
                 <div className="hidden md:flex items-center gap-4">
                     <ModeToggle />
                     <SignedIn>
-                        <Link href={`/${userId}`}>
+                        <Link href={`/setup`}>
                             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                                 <Button variant="default" size="sm">
                                     Dashboard
