@@ -25,21 +25,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProviderWrapper>
-      <html lang="en" suppressHydrationWarning>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={true}
+          storageKey="discord-theme"
         >
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            enableSystem={true}
-            storageKey="discord-theme"
-          >
+          <ClerkProviderWrapper>
             {children}
-          </ThemeProvider>
-        </body>
-      </html>
-    </ClerkProviderWrapper>
+          </ClerkProviderWrapper>
+        </ThemeProvider>
+      </body>
+    </html>
   );
 }

@@ -4,7 +4,7 @@ import { Navbar } from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { motion } from "motion/react";
-import { Download, Globe, Shield, Sparkles, Users, Zap, LayoutDashboard } from "lucide-react";
+import { Download, Globe, Shield, Sparkles, Users, Zap, LayoutDashboard, Twitter, Instagram, Facebook, Youtube } from "lucide-react";
 import { SignedIn, SignedOut, useAuth } from "@clerk/nextjs";
 
 export default function Home() {
@@ -83,13 +83,13 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 1 }}
-            className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-primary/10 rounded-full blur-3xl -z-10"
+            className="absolute top-1/2 left-0 -translate-y-1/2 -translate-x-1/2 w-125 h-125 bg-primary/10 rounded-full blur-3xl -z-10"
           />
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7, duration: 1 }}
-            className="absolute bottom-0 right-0 translate-y-1/4 translate-x-1/4 w-[600px] h-[600px] bg-secondary/10 rounded-full blur-3xl -z-10"
+            className="absolute bottom-0 right-0 translate-y-1/4 translate-x-1/4 w-150 h-150 bg-secondary/10 rounded-full blur-3xl -z-10"
           />
         </section>
 
@@ -139,8 +139,9 @@ export default function Home() {
                   Low-latency voice and video feels like you’re in the same room. Wave hello over video, watch friends stream their games, or gather up and have a drawing session with screen share.
                 </p>
                 <div className="pt-4">
-                  <div className="relative w-full h-64 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl border border-primary/20 flex items-center justify-center overflow-hidden">
-                    <Sparkles className="h-24 w-24 text-primary/40 animate-pulse" />
+                  <div className="relative w-full h-80 bg-card rounded-xl border border-border shadow-inner flex items-center justify-center overflow-hidden">
+                    <div className="absolute inset-0 bg-grid-white/5 mask-[linear-gradient(0deg,white,rgba(255,255,255,0.6))]" />
+                    <Sparkles className="h-32 w-32 text-muted-foreground/20" />
                   </div>
                 </div>
               </motion.div>
@@ -167,6 +168,24 @@ export default function Home() {
                     <div>
                       <h3 className="font-bold text-xl">Join Communities</h3>
                       <p className="text-muted-foreground">Explore thousands of communities for your interests.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4 p-4 rounded-lg hover:bg-muted/50 transition-colors">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Shield className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-xl">Reliable & Secure</h3>
+                      <p className="text-muted-foreground">Feel safe with our robust moderation tools.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-4 p-4 rounded-lg hover:bg-muted/50 transition-colors">
+                    <div className="p-2 bg-secondary/10 rounded-lg">
+                      <Sparkles className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-xl">Customizable Experience</h3>
+                      <p className="text-muted-foreground">Make your server truly yours with roles and permissions.</p>
                     </div>
                   </div>
                 </div>
@@ -246,8 +265,22 @@ export default function Home() {
             <div className="flex items-center gap-2 font-bold text-xl text-primary">
               <span>Discord</span>
             </div>
+            <div className="flex items-center gap-6">
+              <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <Twitter className="h-5 w-5" />
+              </Link>
+              <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <Instagram className="h-5 w-5" />
+              </Link>
+              <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <Facebook className="h-5 w-5" />
+              </Link>
+              <Link href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <Youtube className="h-5 w-5" />
+              </Link>
+            </div>
             <p className="text-center text-sm text-muted-foreground">
-              &copy; 2024 Discord Clone. Built by Arbaz Ansari.
+              &copy; 2025 Discord Clone
             </p>
           </div>
         </div>
