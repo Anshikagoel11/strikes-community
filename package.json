@@ -9,6 +9,7 @@
         "lint": "eslint",
         "db:migrate": "npx prisma migrate",
         "db:migrate_dev": "npx prisma migrate dev",
+        "postinstall": "npx prisma generate",
         "db:generate": "npx prisma generate",
         "db:studio": "npx prisma studio"
     },
