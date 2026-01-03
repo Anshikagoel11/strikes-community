@@ -1,5 +1,5 @@
 import { CurrentProfile } from '@/lib/current-profile'
-import { prisma } from '@/lib/prisma';
+import { prisma } from "@/lib/prisma";
 import { redirect } from 'next/navigation';
 
 const InviteCodePage = async ({ params }: { params: Promise<{ InviteCode: string }> }) => {
