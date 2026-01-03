@@ -19,12 +19,13 @@ export async function PATCH(
         if (!serverId) {
             return new NextResponse("server id is missing", { status: 400 });
         }
+        const sid = serverId as string;
         if (!memberId) {
             return new NextResponse("member id is missing", { status: 400 });
         }
         // Ensure the server belongs to the current profile (owner)
         const serverRecord = await prisma.server.findUnique({
-            where: { id: serverId },
+            where: { id: sid },
             select: { id: true, profileId: true },
         });
 
@@ -36,7 +37,7 @@ export async function PATCH(
         await prisma.member.updateMany({
             where: {
                 id: memberId,
-                serverId,
+                serverId: sid,
                 profileId: { not: profile.id },
             },
             data: {
@@ -46,7 +47,7 @@ export async function PATCH(
 
         // Return the server with updated members
         const server = await prisma.server.findUnique({
-            where: { id: serverId },
+            where: { id: sid },
             include: {
                 members: {
                     include: { profile: true },
@@ -72,13 +73,22 @@ export async function DELETE(
         const { searchParams } = new URL(req.url);
         const serverId = searchParams.get("serverId");
 
+        if (!serverId)
+            return new NextResponse("server id is missing", { status: 400 });
+
+        const sid = serverId as string;
+
+        if (!profile) {
+            return new NextResponse("unauthorize", { status: 401 });
+        }
+
         
         if (!memberId)
             return new NextResponse("member id required", { status: 400 });
 
         // Ensure the requester owns the server
         const serverRecord = await prisma.server.findUnique({
-            where: { id: serverId },
+            where: { id: sid },
             select: { id: true, profileId: true },
         });
 
@@ -91,13 +101,13 @@ export async function DELETE(
         await prisma.member.deleteMany({
             where: {
                 id: memberId,
-                serverId,
+                serverId: sid,
                 profileId: { not: profile.id },
             },
         });
 
         const server = await prisma.server.findUnique({
-            where: { id: serverId },
+            where: { id: sid },
             include: {
                 members: {
                     include: { profile: true },
