@@ -72,9 +72,7 @@ export async function DELETE(
         const { searchParams } = new URL(req.url);
         const serverId = searchParams.get("serverId");
 
-        if (!profile) return new NextResponse("unauthorized", { status: 401 });
-        if (!serverId)
-            return new NextResponse("serverId is missing", { status: 400 });
+        
         if (!memberId)
             return new NextResponse("member id required", { status: 400 });
 

@@ -30,7 +30,7 @@ const NavigationItems = ({ id, imageUrl, name }: navigationItemProps) => {
                     params?.serverId === id ? "h-9" : "h-1"
                 )} />
                 <div className={cn(
-                    "relative group flex mx-4 h-10 w-10 rounded-[24px] group-hover:rounded-3xl transition-all overflow-hidden",
+                    "relative group flex mx-4 h-10 w-10 rounded-[24px] group-hover:rounded-3xl transition-all overflow-hidden border border-primary/10",
                     params?.serverId === id && "bg-primary/10 text-primary rounded-3xl"
                 )}>
                     <Image
