@@ -3,6 +3,7 @@ import { MemberRole } from "@/lib/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
+
 export async function POST(req: Request) {
     try {
         const { name, imageUrl } = await req.json();

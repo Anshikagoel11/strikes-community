@@ -2,7 +2,9 @@ import React from 'react'
 
 const ServerPage = () => {
     return (
-        <div>ServerPage</div>
+        <div className='h-full'>
+            <h1>working</h1>
+        </div>
     )
 }
 

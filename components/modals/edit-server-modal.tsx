@@ -1,6 +1,6 @@
 "use client"
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -23,11 +23,12 @@ const formSchema = z.object({
 })
 
 
-const CreateServerModal = () => {
+const EditServerModal = () => {
     const router = useRouter()
-    const { isOpen, onClose, type } = useModal()
+    const { isOpen, onClose, type, data } = useModal()
 
-    const isModalOpen = isOpen && type == "createServer"
+    const isModalOpen = isOpen && type == "editServer"
+    const { server } = data
 
     const form = useForm({
         resolver: zodResolver(formSchema),
@@ -36,20 +37,28 @@ const CreateServerModal = () => {
             imageUrl: ""
         }
     })
+
+    useEffect(() => {
+        if (server) {
+            form.setValue("name", server.name)
+            form.setValue("imageUrl", server.imageUrl)
+        }
+    }, [server, form])
+
     const loading = form.formState.isSubmitting;
 
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        const loadingId = toast.loading("Creating server...")
+        const loadingId = toast.loading("Updating server...")
         try {
-            await axios.post("/api/servers", values)
+            await axios.patch(`/api/servers/${server?.id}`, values)
             form.reset();
             router.refresh()
             onClose();
-            toast.success("Server created successfully!", {
+            toast.success("Settings updated!", {
                 id: loadingId
             })
         } catch (error) {
-            console.log("unable to create/join server", error)
+            console.log("unable to update server", error)
             toast.error("Something went wrong. Please try again.", {
                 id: loadingId
             })
@@ -57,7 +66,6 @@ const CreateServerModal = () => {
     }
 
     const handleClose = () => {
-        form.reset();
         onClose()
     }
     return (
@@ -116,7 +124,7 @@ const CreateServerModal = () => {
                         </div>
                         <DialogFooter className="bg-muted/50 px-6 py-4">
                             <Button disabled={loading} variant="primary">
-                                {loading ? <Spinner /> : "Create"}
+                                {loading ? <Spinner /> : "Save"}
                             </Button>
                         </DialogFooter>
                     </form>
@@ -126,4 +134,4 @@ const CreateServerModal = () => {
     )
 }
 
-export default CreateServerModal
+export default EditServerModal

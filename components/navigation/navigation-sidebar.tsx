@@ -26,31 +26,36 @@ const NavigationSidebar = async () => {
     })
 
     return (
-        <div className='space-y-4 flex flex-col items-center h-full text-primary w-full bg-secondary py-3'>
-            <NavigationAction />
-            <Separator
-                className="bg-muted-foreground/20 rounded-md w-10 mx-auto"
-            />
+        <nav aria-label="Server sidebar" className='flex flex-col items-center h-full text-primary bg-secondary py-3'>
+            <div className='flex flex-col items-center w-full space-y-4'>
+                <NavigationAction />
+                <Separator className="bg-muted-foreground/20 rounded-md w-10 mx-auto mb-2" />
+            </div>
 
             <ScrollArea className='flex-1 w-full'>
-                {servers.map((server) => (
-                    <div key={server.id} className="mb-4">
-                        <NavigationItems
-                            id={server.id} name={server.name} imageUrl={server.imageUrl}
-                        />
-                    </div>
-                ))}
+                <ul className='flex flex-col items-center gap-2 py-2'>
+                    {servers.length === 0 ? (
+                        <li className='text-xs text-muted-foreground px-2 text-center'>
+                            No servers yet — join or create one.
+                        </li>
+                    ) : servers.map((server) => (
+                        <li key={server.id} className="mb-0">
+                            <NavigationItems id={server.id} name={server.name} imageUrl={server.imageUrl} />
+                        </li>
+                    ))}
+                </ul>
             </ScrollArea>
-            <Separator
-                className="bg-muted-foreground/20 rounded-md w-10 mx-auto"
-            />
 
-            <div className='mt-auto flex items-center flex-col gap-y-4'>
-                <ModeToggle
-                />
-                <UserButton />
+            <div className='w-full'>
+                <Separator className="bg-muted-foreground/20 rounded-md w-10 mx-auto" />
+                <div className='mt-2 flex items-center flex-col gap-y-3'>
+                    <ModeToggle />
+                    <div className='w-full flex justify-center'>
+                        <UserButton />
+                    </div>
+                </div>
             </div>
-        </div>
+        </nav>
     )
 }
 
