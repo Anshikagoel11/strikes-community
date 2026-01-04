@@ -36,7 +36,7 @@ const NavigationSidebar = async () => {
                 <ul className='flex flex-col items-center gap-2 py-2'>
                     {servers.length === 0 ? (
                         <li className='text-xs text-muted-foreground px-2 text-center'>
-                            No servers yet — join or create one.
+                            No servers 
                         </li>
                     ) : servers.map((server) => (
                         <li key={server.id} className="mb-0">
