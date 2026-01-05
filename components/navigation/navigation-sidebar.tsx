@@ -1,4 +1,3 @@
-import React from 'react'
 import { redirect } from 'next/navigation'
 import { CurrentProfile } from '@/lib/current-profile'
 import { prisma } from '@/lib/prisma'
@@ -36,7 +35,7 @@ const NavigationSidebar = async () => {
                 <ul className='flex flex-col items-center gap-2 py-2'>
                     {servers.length === 0 ? (
                         <li className='text-xs text-muted-foreground px-2 text-center'>
-                            No servers 
+                            No servers
                         </li>
                     ) : servers.map((server) => (
                         <li key={server.id} className="mb-0">
@@ -51,7 +50,7 @@ const NavigationSidebar = async () => {
                 <div className='mt-2 flex items-center flex-col gap-y-3'>
                     <ModeToggle />
                     <div className='w-full flex justify-center'>
-                        <UserButton />
+                        <UserButton/>
                     </div>
                 </div>
             </div>
