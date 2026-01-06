@@ -1,10 +1,19 @@
 import { CurrentProfilePages } from "@/lib/current-profile-pages";
 import { prisma } from "@/lib/prisma";
+import type { Server as SocketServer } from "socket.io";
 import { NextApiRequest, NextApiResponse } from "next";
+
+type NextApiResponseWithSocket = NextApiResponse & {
+    socket: {
+        server: {
+            io?: SocketServer;
+        };
+    };
+};
 
 export default async function handler(
     req: NextApiRequest,
-    res: NextApiResponse
+    res: NextApiResponseWithSocket
 ) {
     if (req.method != "POST") {
         return res.status(405).json({ error: "method not allowed" });
