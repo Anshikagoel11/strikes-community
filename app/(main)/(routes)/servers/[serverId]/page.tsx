@@ -12,34 +12,33 @@ const ServerPage = async ({ params }: { params: Promise<{ serverId: string }> })
 
     const server = await prisma.server.findUnique({
         where: {
-            id: serverId
+            id: serverId,
+            members: {
+                some: {
+                    profileId: profile.id
+                }
+            }
         },
         include: {
             channels: {
+                where: {
+                    name: "general"
+                },
                 orderBy: {
                     createdAt: "asc"
                 }
             },
-            members: {
-                include: {
-                    profile: true
-                },
-                orderBy: {
-                    role: "asc"
-                }
-            }
         }
     })
     if (!server) {
         return redirect("/sign-in")
     }
 
-    return (
-        <div className='h-full w-full flex justify-center items-center flex-col'>
-            <h1>{`Server Id: ${serverId}`}</h1>
-            <h2>{`Server Name: ${server.name}`}</h2>
-        </div>
-    )
+    const initialChannel = server?.channels[0]
+    if (initialChannel.name != "general") {
+        return null
+    }
+    return redirect(`/servers/${serverId}/channels/${initialChannel?.id}`)
 }
 
 export default ServerPage

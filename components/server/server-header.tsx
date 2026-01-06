@@ -13,7 +13,7 @@ const ServerHeader = ({ server, role }: { server: ServerWithMembersWithProfile, 
     return (
         <DropdownMenu>
             <DropdownMenuTrigger className='focus:outline-none' asChild>
-                <button className='w-full text-md font-semibold px-3 flex items-center h-12 border-neutral-200 dark:border-neutral-800 border-b-2 hover:bg-accent/50 transition group'>
+                <button className='w-full text-md font-semibold px-3 flex items-center h-12 border-b-2 border-primary/10 transition group bg-card'>
                     <span className='truncate'>{server.name}</span>
                     <ChevronDown className='h-5 w-5 ml-auto transition-transform group-hover:rotate-180' />
                 </button>
@@ -46,7 +46,7 @@ const ServerHeader = ({ server, role }: { server: ServerWithMembersWithProfile, 
                 {isModerator && <DropdownMenuSeparator />}
                 {isAdmin && (
                     <DropdownMenuItem variant="destructive" className='px-3 py-2 text-sm cursor-pointer'
-                    onClick={()=>onOpen("deleteServer", {server})}
+                        onClick={() => onOpen("deleteServer", { server })}
                     >
                         Delete Server
                         <Trash className='h-4 w-4 ml-auto' />

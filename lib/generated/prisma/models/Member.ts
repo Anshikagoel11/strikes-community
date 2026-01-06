@@ -192,6 +192,10 @@ export type MemberWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Member"> | Date | string
   profile?: Prisma.XOR<Prisma.ProfileScalarRelationFilter, Prisma.ProfileWhereInput>
   server?: Prisma.XOR<Prisma.ServerScalarRelationFilter, Prisma.ServerWhereInput>
+  messages?: Prisma.MessageListRelationFilter
+  conversationInitialed?: Prisma.ConversationListRelationFilter
+  conversationReceived?: Prisma.ConversationListRelationFilter
+  directMessages?: Prisma.DirectMessageListRelationFilter
 }
 
 export type MemberOrderByWithRelationInput = {
@@ -203,6 +207,10 @@ export type MemberOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   profile?: Prisma.ProfileOrderByWithRelationInput
   server?: Prisma.ServerOrderByWithRelationInput
+  messages?: Prisma.MessageOrderByRelationAggregateInput
+  conversationInitialed?: Prisma.ConversationOrderByRelationAggregateInput
+  conversationReceived?: Prisma.ConversationOrderByRelationAggregateInput
+  directMessages?: Prisma.DirectMessageOrderByRelationAggregateInput
 }
 
 export type MemberWhereUniqueInput = Prisma.AtLeast<{
@@ -217,6 +225,10 @@ export type MemberWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Member"> | Date | string
   profile?: Prisma.XOR<Prisma.ProfileScalarRelationFilter, Prisma.ProfileWhereInput>
   server?: Prisma.XOR<Prisma.ServerScalarRelationFilter, Prisma.ServerWhereInput>
+  messages?: Prisma.MessageListRelationFilter
+  conversationInitialed?: Prisma.ConversationListRelationFilter
+  conversationReceived?: Prisma.ConversationListRelationFilter
+  directMessages?: Prisma.DirectMessageListRelationFilter
 }, "id">
 
 export type MemberOrderByWithAggregationInput = {
@@ -250,6 +262,10 @@ export type MemberCreateInput = {
   updatedAt?: Date | string
   profile: Prisma.ProfileCreateNestedOneWithoutMembersInput
   server: Prisma.ServerCreateNestedOneWithoutMembersInput
+  messages?: Prisma.MessageCreateNestedManyWithoutMemberInput
+  conversationInitialed?: Prisma.ConversationCreateNestedManyWithoutMemberOneInput
+  conversationReceived?: Prisma.ConversationCreateNestedManyWithoutMemberTwoInput
+  directMessages?: Prisma.DirectMessageCreateNestedManyWithoutMemberInput
 }
 
 export type MemberUncheckedCreateInput = {
@@ -259,6 +275,10 @@ export type MemberUncheckedCreateInput = {
   serverId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutMemberInput
+  conversationInitialed?: Prisma.ConversationUncheckedCreateNestedManyWithoutMemberOneInput
+  conversationReceived?: Prisma.ConversationUncheckedCreateNestedManyWithoutMemberTwoInput
+  directMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutMemberInput
 }
 
 export type MemberUpdateInput = {
@@ -268,6 +288,10 @@ export type MemberUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   profile?: Prisma.ProfileUpdateOneRequiredWithoutMembersNestedInput
   server?: Prisma.ServerUpdateOneRequiredWithoutMembersNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutMemberNestedInput
+  conversationInitialed?: Prisma.ConversationUpdateManyWithoutMemberOneNestedInput
+  conversationReceived?: Prisma.ConversationUpdateManyWithoutMemberTwoNestedInput
+  directMessages?: Prisma.DirectMessageUpdateManyWithoutMemberNestedInput
 }
 
 export type MemberUncheckedUpdateInput = {
@@ -277,6 +301,10 @@ export type MemberUncheckedUpdateInput = {
   serverId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutMemberNestedInput
+  conversationInitialed?: Prisma.ConversationUncheckedUpdateManyWithoutMemberOneNestedInput
+  conversationReceived?: Prisma.ConversationUncheckedUpdateManyWithoutMemberTwoNestedInput
+  directMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutMemberNestedInput
 }
 
 export type MemberCreateManyInput = {
@@ -339,6 +367,11 @@ export type MemberMinOrderByAggregateInput = {
   serverId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type MemberScalarRelationFilter = {
+  is?: Prisma.MemberWhereInput
+  isNot?: Prisma.MemberWhereInput
 }
 
 export type MemberCreateNestedManyWithoutProfileInput = {
@@ -429,12 +462,72 @@ export type EnumMemberRoleFieldUpdateOperationsInput = {
   set?: $Enums.MemberRole
 }
 
+export type MemberCreateNestedOneWithoutMessagesInput = {
+  create?: Prisma.XOR<Prisma.MemberCreateWithoutMessagesInput, Prisma.MemberUncheckedCreateWithoutMessagesInput>
+  connectOrCreate?: Prisma.MemberCreateOrConnectWithoutMessagesInput
+  connect?: Prisma.MemberWhereUniqueInput
+}
+
+export type MemberUpdateOneRequiredWithoutMessagesNestedInput = {
+  create?: Prisma.XOR<Prisma.MemberCreateWithoutMessagesInput, Prisma.MemberUncheckedCreateWithoutMessagesInput>
+  connectOrCreate?: Prisma.MemberCreateOrConnectWithoutMessagesInput
+  upsert?: Prisma.MemberUpsertWithoutMessagesInput
+  connect?: Prisma.MemberWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MemberUpdateToOneWithWhereWithoutMessagesInput, Prisma.MemberUpdateWithoutMessagesInput>, Prisma.MemberUncheckedUpdateWithoutMessagesInput>
+}
+
+export type MemberCreateNestedOneWithoutConversationInitialedInput = {
+  create?: Prisma.XOR<Prisma.MemberCreateWithoutConversationInitialedInput, Prisma.MemberUncheckedCreateWithoutConversationInitialedInput>
+  connectOrCreate?: Prisma.MemberCreateOrConnectWithoutConversationInitialedInput
+  connect?: Prisma.MemberWhereUniqueInput
+}
+
+export type MemberCreateNestedOneWithoutConversationReceivedInput = {
+  create?: Prisma.XOR<Prisma.MemberCreateWithoutConversationReceivedInput, Prisma.MemberUncheckedCreateWithoutConversationReceivedInput>
+  connectOrCreate?: Prisma.MemberCreateOrConnectWithoutConversationReceivedInput
+  connect?: Prisma.MemberWhereUniqueInput
+}
+
+export type MemberUpdateOneRequiredWithoutConversationInitialedNestedInput = {
+  create?: Prisma.XOR<Prisma.MemberCreateWithoutConversationInitialedInput, Prisma.MemberUncheckedCreateWithoutConversationInitialedInput>
+  connectOrCreate?: Prisma.MemberCreateOrConnectWithoutConversationInitialedInput
+  upsert?: Prisma.MemberUpsertWithoutConversationInitialedInput
+  connect?: Prisma.MemberWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MemberUpdateToOneWithWhereWithoutConversationInitialedInput, Prisma.MemberUpdateWithoutConversationInitialedInput>, Prisma.MemberUncheckedUpdateWithoutConversationInitialedInput>
+}
+
+export type MemberUpdateOneRequiredWithoutConversationReceivedNestedInput = {
+  create?: Prisma.XOR<Prisma.MemberCreateWithoutConversationReceivedInput, Prisma.MemberUncheckedCreateWithoutConversationReceivedInput>
+  connectOrCreate?: Prisma.MemberCreateOrConnectWithoutConversationReceivedInput
+  upsert?: Prisma.MemberUpsertWithoutConversationReceivedInput
+  connect?: Prisma.MemberWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MemberUpdateToOneWithWhereWithoutConversationReceivedInput, Prisma.MemberUpdateWithoutConversationReceivedInput>, Prisma.MemberUncheckedUpdateWithoutConversationReceivedInput>
+}
+
+export type MemberCreateNestedOneWithoutDirectMessagesInput = {
+  create?: Prisma.XOR<Prisma.MemberCreateWithoutDirectMessagesInput, Prisma.MemberUncheckedCreateWithoutDirectMessagesInput>
+  connectOrCreate?: Prisma.MemberCreateOrConnectWithoutDirectMessagesInput
+  connect?: Prisma.MemberWhereUniqueInput
+}
+
+export type MemberUpdateOneRequiredWithoutDirectMessagesNestedInput = {
+  create?: Prisma.XOR<Prisma.MemberCreateWithoutDirectMessagesInput, Prisma.MemberUncheckedCreateWithoutDirectMessagesInput>
+  connectOrCreate?: Prisma.MemberCreateOrConnectWithoutDirectMessagesInput
+  upsert?: Prisma.MemberUpsertWithoutDirectMessagesInput
+  connect?: Prisma.MemberWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.MemberUpdateToOneWithWhereWithoutDirectMessagesInput, Prisma.MemberUpdateWithoutDirectMessagesInput>, Prisma.MemberUncheckedUpdateWithoutDirectMessagesInput>
+}
+
 export type MemberCreateWithoutProfileInput = {
   id?: string
   role?: $Enums.MemberRole
   createdAt?: Date | string
   updatedAt?: Date | string
   server: Prisma.ServerCreateNestedOneWithoutMembersInput
+  messages?: Prisma.MessageCreateNestedManyWithoutMemberInput
+  conversationInitialed?: Prisma.ConversationCreateNestedManyWithoutMemberOneInput
+  conversationReceived?: Prisma.ConversationCreateNestedManyWithoutMemberTwoInput
+  directMessages?: Prisma.DirectMessageCreateNestedManyWithoutMemberInput
 }
 
 export type MemberUncheckedCreateWithoutProfileInput = {
@@ -443,6 +536,10 @@ export type MemberUncheckedCreateWithoutProfileInput = {
   serverId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutMemberInput
+  conversationInitialed?: Prisma.ConversationUncheckedCreateNestedManyWithoutMemberOneInput
+  conversationReceived?: Prisma.ConversationUncheckedCreateNestedManyWithoutMemberTwoInput
+  directMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutMemberInput
 }
 
 export type MemberCreateOrConnectWithoutProfileInput = {
@@ -489,6 +586,10 @@ export type MemberCreateWithoutServerInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   profile: Prisma.ProfileCreateNestedOneWithoutMembersInput
+  messages?: Prisma.MessageCreateNestedManyWithoutMemberInput
+  conversationInitialed?: Prisma.ConversationCreateNestedManyWithoutMemberOneInput
+  conversationReceived?: Prisma.ConversationCreateNestedManyWithoutMemberTwoInput
+  directMessages?: Prisma.DirectMessageCreateNestedManyWithoutMemberInput
 }
 
 export type MemberUncheckedCreateWithoutServerInput = {
@@ -497,6 +598,10 @@ export type MemberUncheckedCreateWithoutServerInput = {
   profileId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutMemberInput
+  conversationInitialed?: Prisma.ConversationUncheckedCreateNestedManyWithoutMemberOneInput
+  conversationReceived?: Prisma.ConversationUncheckedCreateNestedManyWithoutMemberTwoInput
+  directMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutMemberInput
 }
 
 export type MemberCreateOrConnectWithoutServerInput = {
@@ -525,6 +630,262 @@ export type MemberUpdateManyWithWhereWithoutServerInput = {
   data: Prisma.XOR<Prisma.MemberUpdateManyMutationInput, Prisma.MemberUncheckedUpdateManyWithoutServerInput>
 }
 
+export type MemberCreateWithoutMessagesInput = {
+  id?: string
+  role?: $Enums.MemberRole
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  profile: Prisma.ProfileCreateNestedOneWithoutMembersInput
+  server: Prisma.ServerCreateNestedOneWithoutMembersInput
+  conversationInitialed?: Prisma.ConversationCreateNestedManyWithoutMemberOneInput
+  conversationReceived?: Prisma.ConversationCreateNestedManyWithoutMemberTwoInput
+  directMessages?: Prisma.DirectMessageCreateNestedManyWithoutMemberInput
+}
+
+export type MemberUncheckedCreateWithoutMessagesInput = {
+  id?: string
+  role?: $Enums.MemberRole
+  profileId: string
+  serverId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  conversationInitialed?: Prisma.ConversationUncheckedCreateNestedManyWithoutMemberOneInput
+  conversationReceived?: Prisma.ConversationUncheckedCreateNestedManyWithoutMemberTwoInput
+  directMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutMemberInput
+}
+
+export type MemberCreateOrConnectWithoutMessagesInput = {
+  where: Prisma.MemberWhereUniqueInput
+  create: Prisma.XOR<Prisma.MemberCreateWithoutMessagesInput, Prisma.MemberUncheckedCreateWithoutMessagesInput>
+}
+
+export type MemberUpsertWithoutMessagesInput = {
+  update: Prisma.XOR<Prisma.MemberUpdateWithoutMessagesInput, Prisma.MemberUncheckedUpdateWithoutMessagesInput>
+  create: Prisma.XOR<Prisma.MemberCreateWithoutMessagesInput, Prisma.MemberUncheckedCreateWithoutMessagesInput>
+  where?: Prisma.MemberWhereInput
+}
+
+export type MemberUpdateToOneWithWhereWithoutMessagesInput = {
+  where?: Prisma.MemberWhereInput
+  data: Prisma.XOR<Prisma.MemberUpdateWithoutMessagesInput, Prisma.MemberUncheckedUpdateWithoutMessagesInput>
+}
+
+export type MemberUpdateWithoutMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profile?: Prisma.ProfileUpdateOneRequiredWithoutMembersNestedInput
+  server?: Prisma.ServerUpdateOneRequiredWithoutMembersNestedInput
+  conversationInitialed?: Prisma.ConversationUpdateManyWithoutMemberOneNestedInput
+  conversationReceived?: Prisma.ConversationUpdateManyWithoutMemberTwoNestedInput
+  directMessages?: Prisma.DirectMessageUpdateManyWithoutMemberNestedInput
+}
+
+export type MemberUncheckedUpdateWithoutMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole
+  profileId?: Prisma.StringFieldUpdateOperationsInput | string
+  serverId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  conversationInitialed?: Prisma.ConversationUncheckedUpdateManyWithoutMemberOneNestedInput
+  conversationReceived?: Prisma.ConversationUncheckedUpdateManyWithoutMemberTwoNestedInput
+  directMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutMemberNestedInput
+}
+
+export type MemberCreateWithoutConversationInitialedInput = {
+  id?: string
+  role?: $Enums.MemberRole
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  profile: Prisma.ProfileCreateNestedOneWithoutMembersInput
+  server: Prisma.ServerCreateNestedOneWithoutMembersInput
+  messages?: Prisma.MessageCreateNestedManyWithoutMemberInput
+  conversationReceived?: Prisma.ConversationCreateNestedManyWithoutMemberTwoInput
+  directMessages?: Prisma.DirectMessageCreateNestedManyWithoutMemberInput
+}
+
+export type MemberUncheckedCreateWithoutConversationInitialedInput = {
+  id?: string
+  role?: $Enums.MemberRole
+  profileId: string
+  serverId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutMemberInput
+  conversationReceived?: Prisma.ConversationUncheckedCreateNestedManyWithoutMemberTwoInput
+  directMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutMemberInput
+}
+
+export type MemberCreateOrConnectWithoutConversationInitialedInput = {
+  where: Prisma.MemberWhereUniqueInput
+  create: Prisma.XOR<Prisma.MemberCreateWithoutConversationInitialedInput, Prisma.MemberUncheckedCreateWithoutConversationInitialedInput>
+}
+
+export type MemberCreateWithoutConversationReceivedInput = {
+  id?: string
+  role?: $Enums.MemberRole
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  profile: Prisma.ProfileCreateNestedOneWithoutMembersInput
+  server: Prisma.ServerCreateNestedOneWithoutMembersInput
+  messages?: Prisma.MessageCreateNestedManyWithoutMemberInput
+  conversationInitialed?: Prisma.ConversationCreateNestedManyWithoutMemberOneInput
+  directMessages?: Prisma.DirectMessageCreateNestedManyWithoutMemberInput
+}
+
+export type MemberUncheckedCreateWithoutConversationReceivedInput = {
+  id?: string
+  role?: $Enums.MemberRole
+  profileId: string
+  serverId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutMemberInput
+  conversationInitialed?: Prisma.ConversationUncheckedCreateNestedManyWithoutMemberOneInput
+  directMessages?: Prisma.DirectMessageUncheckedCreateNestedManyWithoutMemberInput
+}
+
+export type MemberCreateOrConnectWithoutConversationReceivedInput = {
+  where: Prisma.MemberWhereUniqueInput
+  create: Prisma.XOR<Prisma.MemberCreateWithoutConversationReceivedInput, Prisma.MemberUncheckedCreateWithoutConversationReceivedInput>
+}
+
+export type MemberUpsertWithoutConversationInitialedInput = {
+  update: Prisma.XOR<Prisma.MemberUpdateWithoutConversationInitialedInput, Prisma.MemberUncheckedUpdateWithoutConversationInitialedInput>
+  create: Prisma.XOR<Prisma.MemberCreateWithoutConversationInitialedInput, Prisma.MemberUncheckedCreateWithoutConversationInitialedInput>
+  where?: Prisma.MemberWhereInput
+}
+
+export type MemberUpdateToOneWithWhereWithoutConversationInitialedInput = {
+  where?: Prisma.MemberWhereInput
+  data: Prisma.XOR<Prisma.MemberUpdateWithoutConversationInitialedInput, Prisma.MemberUncheckedUpdateWithoutConversationInitialedInput>
+}
+
+export type MemberUpdateWithoutConversationInitialedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profile?: Prisma.ProfileUpdateOneRequiredWithoutMembersNestedInput
+  server?: Prisma.ServerUpdateOneRequiredWithoutMembersNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutMemberNestedInput
+  conversationReceived?: Prisma.ConversationUpdateManyWithoutMemberTwoNestedInput
+  directMessages?: Prisma.DirectMessageUpdateManyWithoutMemberNestedInput
+}
+
+export type MemberUncheckedUpdateWithoutConversationInitialedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole
+  profileId?: Prisma.StringFieldUpdateOperationsInput | string
+  serverId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutMemberNestedInput
+  conversationReceived?: Prisma.ConversationUncheckedUpdateManyWithoutMemberTwoNestedInput
+  directMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutMemberNestedInput
+}
+
+export type MemberUpsertWithoutConversationReceivedInput = {
+  update: Prisma.XOR<Prisma.MemberUpdateWithoutConversationReceivedInput, Prisma.MemberUncheckedUpdateWithoutConversationReceivedInput>
+  create: Prisma.XOR<Prisma.MemberCreateWithoutConversationReceivedInput, Prisma.MemberUncheckedCreateWithoutConversationReceivedInput>
+  where?: Prisma.MemberWhereInput
+}
+
+export type MemberUpdateToOneWithWhereWithoutConversationReceivedInput = {
+  where?: Prisma.MemberWhereInput
+  data: Prisma.XOR<Prisma.MemberUpdateWithoutConversationReceivedInput, Prisma.MemberUncheckedUpdateWithoutConversationReceivedInput>
+}
+
+export type MemberUpdateWithoutConversationReceivedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profile?: Prisma.ProfileUpdateOneRequiredWithoutMembersNestedInput
+  server?: Prisma.ServerUpdateOneRequiredWithoutMembersNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutMemberNestedInput
+  conversationInitialed?: Prisma.ConversationUpdateManyWithoutMemberOneNestedInput
+  directMessages?: Prisma.DirectMessageUpdateManyWithoutMemberNestedInput
+}
+
+export type MemberUncheckedUpdateWithoutConversationReceivedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole
+  profileId?: Prisma.StringFieldUpdateOperationsInput | string
+  serverId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutMemberNestedInput
+  conversationInitialed?: Prisma.ConversationUncheckedUpdateManyWithoutMemberOneNestedInput
+  directMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutMemberNestedInput
+}
+
+export type MemberCreateWithoutDirectMessagesInput = {
+  id?: string
+  role?: $Enums.MemberRole
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  profile: Prisma.ProfileCreateNestedOneWithoutMembersInput
+  server: Prisma.ServerCreateNestedOneWithoutMembersInput
+  messages?: Prisma.MessageCreateNestedManyWithoutMemberInput
+  conversationInitialed?: Prisma.ConversationCreateNestedManyWithoutMemberOneInput
+  conversationReceived?: Prisma.ConversationCreateNestedManyWithoutMemberTwoInput
+}
+
+export type MemberUncheckedCreateWithoutDirectMessagesInput = {
+  id?: string
+  role?: $Enums.MemberRole
+  profileId: string
+  serverId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  messages?: Prisma.MessageUncheckedCreateNestedManyWithoutMemberInput
+  conversationInitialed?: Prisma.ConversationUncheckedCreateNestedManyWithoutMemberOneInput
+  conversationReceived?: Prisma.ConversationUncheckedCreateNestedManyWithoutMemberTwoInput
+}
+
+export type MemberCreateOrConnectWithoutDirectMessagesInput = {
+  where: Prisma.MemberWhereUniqueInput
+  create: Prisma.XOR<Prisma.MemberCreateWithoutDirectMessagesInput, Prisma.MemberUncheckedCreateWithoutDirectMessagesInput>
+}
+
+export type MemberUpsertWithoutDirectMessagesInput = {
+  update: Prisma.XOR<Prisma.MemberUpdateWithoutDirectMessagesInput, Prisma.MemberUncheckedUpdateWithoutDirectMessagesInput>
+  create: Prisma.XOR<Prisma.MemberCreateWithoutDirectMessagesInput, Prisma.MemberUncheckedCreateWithoutDirectMessagesInput>
+  where?: Prisma.MemberWhereInput
+}
+
+export type MemberUpdateToOneWithWhereWithoutDirectMessagesInput = {
+  where?: Prisma.MemberWhereInput
+  data: Prisma.XOR<Prisma.MemberUpdateWithoutDirectMessagesInput, Prisma.MemberUncheckedUpdateWithoutDirectMessagesInput>
+}
+
+export type MemberUpdateWithoutDirectMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  profile?: Prisma.ProfileUpdateOneRequiredWithoutMembersNestedInput
+  server?: Prisma.ServerUpdateOneRequiredWithoutMembersNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutMemberNestedInput
+  conversationInitialed?: Prisma.ConversationUpdateManyWithoutMemberOneNestedInput
+  conversationReceived?: Prisma.ConversationUpdateManyWithoutMemberTwoNestedInput
+}
+
+export type MemberUncheckedUpdateWithoutDirectMessagesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumMemberRoleFieldUpdateOperationsInput | $Enums.MemberRole
+  profileId?: Prisma.StringFieldUpdateOperationsInput | string
+  serverId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutMemberNestedInput
+  conversationInitialed?: Prisma.ConversationUncheckedUpdateManyWithoutMemberOneNestedInput
+  conversationReceived?: Prisma.ConversationUncheckedUpdateManyWithoutMemberTwoNestedInput
+}
+
 export type MemberCreateManyProfileInput = {
   id?: string
   role?: $Enums.MemberRole
@@ -539,6 +900,10 @@ export type MemberUpdateWithoutProfileInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   server?: Prisma.ServerUpdateOneRequiredWithoutMembersNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutMemberNestedInput
+  conversationInitialed?: Prisma.ConversationUpdateManyWithoutMemberOneNestedInput
+  conversationReceived?: Prisma.ConversationUpdateManyWithoutMemberTwoNestedInput
+  directMessages?: Prisma.DirectMessageUpdateManyWithoutMemberNestedInput
 }
 
 export type MemberUncheckedUpdateWithoutProfileInput = {
@@ -547,6 +912,10 @@ export type MemberUncheckedUpdateWithoutProfileInput = {
   serverId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutMemberNestedInput
+  conversationInitialed?: Prisma.ConversationUncheckedUpdateManyWithoutMemberOneNestedInput
+  conversationReceived?: Prisma.ConversationUncheckedUpdateManyWithoutMemberTwoNestedInput
+  directMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutMemberNestedInput
 }
 
 export type MemberUncheckedUpdateManyWithoutProfileInput = {
@@ -571,6 +940,10 @@ export type MemberUpdateWithoutServerInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   profile?: Prisma.ProfileUpdateOneRequiredWithoutMembersNestedInput
+  messages?: Prisma.MessageUpdateManyWithoutMemberNestedInput
+  conversationInitialed?: Prisma.ConversationUpdateManyWithoutMemberOneNestedInput
+  conversationReceived?: Prisma.ConversationUpdateManyWithoutMemberTwoNestedInput
+  directMessages?: Prisma.DirectMessageUpdateManyWithoutMemberNestedInput
 }
 
 export type MemberUncheckedUpdateWithoutServerInput = {
@@ -579,6 +952,10 @@ export type MemberUncheckedUpdateWithoutServerInput = {
   profileId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  messages?: Prisma.MessageUncheckedUpdateManyWithoutMemberNestedInput
+  conversationInitialed?: Prisma.ConversationUncheckedUpdateManyWithoutMemberOneNestedInput
+  conversationReceived?: Prisma.ConversationUncheckedUpdateManyWithoutMemberTwoNestedInput
+  directMessages?: Prisma.DirectMessageUncheckedUpdateManyWithoutMemberNestedInput
 }
 
 export type MemberUncheckedUpdateManyWithoutServerInput = {
@@ -590,6 +967,62 @@ export type MemberUncheckedUpdateManyWithoutServerInput = {
 }
 
 
+/**
+ * Count Type MemberCountOutputType
+ */
+
+export type MemberCountOutputType = {
+  messages: number
+  conversationInitialed: number
+  conversationReceived: number
+  directMessages: number
+}
+
+export type MemberCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  messages?: boolean | MemberCountOutputTypeCountMessagesArgs
+  conversationInitialed?: boolean | MemberCountOutputTypeCountConversationInitialedArgs
+  conversationReceived?: boolean | MemberCountOutputTypeCountConversationReceivedArgs
+  directMessages?: boolean | MemberCountOutputTypeCountDirectMessagesArgs
+}
+
+/**
+ * MemberCountOutputType without action
+ */
+export type MemberCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MemberCountOutputType
+   */
+  select?: Prisma.MemberCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * MemberCountOutputType without action
+ */
+export type MemberCountOutputTypeCountMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MessageWhereInput
+}
+
+/**
+ * MemberCountOutputType without action
+ */
+export type MemberCountOutputTypeCountConversationInitialedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ConversationWhereInput
+}
+
+/**
+ * MemberCountOutputType without action
+ */
+export type MemberCountOutputTypeCountConversationReceivedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ConversationWhereInput
+}
+
+/**
+ * MemberCountOutputType without action
+ */
+export type MemberCountOutputTypeCountDirectMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DirectMessageWhereInput
+}
+
 
 export type MemberSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -600,6 +1033,11 @@ export type MemberSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   updatedAt?: boolean
   profile?: boolean | Prisma.ProfileDefaultArgs<ExtArgs>
   server?: boolean | Prisma.ServerDefaultArgs<ExtArgs>
+  messages?: boolean | Prisma.Member$messagesArgs<ExtArgs>
+  conversationInitialed?: boolean | Prisma.Member$conversationInitialedArgs<ExtArgs>
+  conversationReceived?: boolean | Prisma.Member$conversationReceivedArgs<ExtArgs>
+  directMessages?: boolean | Prisma.Member$directMessagesArgs<ExtArgs>
+  _count?: boolean | Prisma.MemberCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["member"]>
 
 export type MemberSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -637,6 +1075,11 @@ export type MemberOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
 export type MemberInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   profile?: boolean | Prisma.ProfileDefaultArgs<ExtArgs>
   server?: boolean | Prisma.ServerDefaultArgs<ExtArgs>
+  messages?: boolean | Prisma.Member$messagesArgs<ExtArgs>
+  conversationInitialed?: boolean | Prisma.Member$conversationInitialedArgs<ExtArgs>
+  conversationReceived?: boolean | Prisma.Member$conversationReceivedArgs<ExtArgs>
+  directMessages?: boolean | Prisma.Member$directMessagesArgs<ExtArgs>
+  _count?: boolean | Prisma.MemberCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type MemberIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   profile?: boolean | Prisma.ProfileDefaultArgs<ExtArgs>
@@ -652,6 +1095,10 @@ export type $MemberPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
   objects: {
     profile: Prisma.$ProfilePayload<ExtArgs>
     server: Prisma.$ServerPayload<ExtArgs>
+    messages: Prisma.$MessagePayload<ExtArgs>[]
+    conversationInitialed: Prisma.$ConversationPayload<ExtArgs>[]
+    conversationReceived: Prisma.$ConversationPayload<ExtArgs>[]
+    directMessages: Prisma.$DirectMessagePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1056,6 +1503,10 @@ export interface Prisma__MemberClient<T, Null = never, ExtArgs extends runtime.T
   readonly [Symbol.toStringTag]: "PrismaPromise"
   profile<T extends Prisma.ProfileDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProfileDefaultArgs<ExtArgs>>): Prisma.Prisma__ProfileClient<runtime.Types.Result.GetResult<Prisma.$ProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   server<T extends Prisma.ServerDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ServerDefaultArgs<ExtArgs>>): Prisma.Prisma__ServerClient<runtime.Types.Result.GetResult<Prisma.$ServerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  messages<T extends Prisma.Member$messagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Member$messagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  conversationInitialed<T extends Prisma.Member$conversationInitialedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Member$conversationInitialedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  conversationReceived<T extends Prisma.Member$conversationReceivedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Member$conversationReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  directMessages<T extends Prisma.Member$directMessagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Member$directMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DirectMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1484,6 +1935,102 @@ export type MemberDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Limit how many Members to delete.
    */
   limit?: number
+}
+
+/**
+ * Member.messages
+ */
+export type Member$messagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Message
+   */
+  select?: Prisma.MessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Message
+   */
+  omit?: Prisma.MessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MessageInclude<ExtArgs> | null
+  where?: Prisma.MessageWhereInput
+  orderBy?: Prisma.MessageOrderByWithRelationInput | Prisma.MessageOrderByWithRelationInput[]
+  cursor?: Prisma.MessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MessageScalarFieldEnum | Prisma.MessageScalarFieldEnum[]
+}
+
+/**
+ * Member.conversationInitialed
+ */
+export type Member$conversationInitialedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Conversation
+   */
+  select?: Prisma.ConversationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Conversation
+   */
+  omit?: Prisma.ConversationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ConversationInclude<ExtArgs> | null
+  where?: Prisma.ConversationWhereInput
+  orderBy?: Prisma.ConversationOrderByWithRelationInput | Prisma.ConversationOrderByWithRelationInput[]
+  cursor?: Prisma.ConversationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ConversationScalarFieldEnum | Prisma.ConversationScalarFieldEnum[]
+}
+
+/**
+ * Member.conversationReceived
+ */
+export type Member$conversationReceivedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Conversation
+   */
+  select?: Prisma.ConversationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Conversation
+   */
+  omit?: Prisma.ConversationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ConversationInclude<ExtArgs> | null
+  where?: Prisma.ConversationWhereInput
+  orderBy?: Prisma.ConversationOrderByWithRelationInput | Prisma.ConversationOrderByWithRelationInput[]
+  cursor?: Prisma.ConversationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ConversationScalarFieldEnum | Prisma.ConversationScalarFieldEnum[]
+}
+
+/**
+ * Member.directMessages
+ */
+export type Member$directMessagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DirectMessage
+   */
+  select?: Prisma.DirectMessageSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DirectMessage
+   */
+  omit?: Prisma.DirectMessageOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DirectMessageInclude<ExtArgs> | null
+  where?: Prisma.DirectMessageWhereInput
+  orderBy?: Prisma.DirectMessageOrderByWithRelationInput | Prisma.DirectMessageOrderByWithRelationInput[]
+  cursor?: Prisma.DirectMessageWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DirectMessageScalarFieldEnum | Prisma.DirectMessageScalarFieldEnum[]
 }
 
 /**

@@ -1,8 +1,49 @@
-import React from 'react'
+import ChatHeader from "@/components/chat/chat-header";
+import ChatInput from "@/components/chat/chat-input";
+import { CurrentProfile } from "@/lib/current-profile";
+import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
 
-const ChannelPage = () => {
+const ChannelPage = async ({ params }: { params: Promise<{ channelId: string, serverId: string }> }) => {
+  const { channelId, serverId } = await params;
+  const profile = await CurrentProfile()
+  if (!profile) {
+    redirect("/sign-in")
+  }
+
+  const channel = await prisma.channel.findUnique({
+    where: {
+      id: channelId
+    }
+  })
+
+  const member = await prisma.member.findFirst({
+    where: {
+      serverId: serverId,
+      profileId: profile.id
+    }
+  })
+  if (!channel || !member) {
+    redirect("/")
+  }
+
+
   return (
-    <div>ChannelPage</div>
+    <div className="flex flex-col min-h-screen">
+      <ChatHeader name={channel.name} serverId={channel.serverId} type="channel" />
+      <div className='flex-1 overflow-y-auto p-4'>Future Messages</div>
+      <div className='border-t bg-muted p-4'>
+        <ChatInput
+          name={channel.name}
+          type={"channel"}
+          apiUrl={"/api/socket/messages"}
+          query={{
+            channelId: channel.id,
+            serverId: serverId
+          }}
+        />
+      </div>
+    </div>
   )
 }
 

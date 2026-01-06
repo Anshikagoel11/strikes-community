@@ -76,7 +76,6 @@ const ServerSidebar = async ({ serverId }: { serverId: string }) => {
 
 
             <ScrollArea className='flex px-3'>
-                <Separator />
                 <div className='my-2'>
                     <ServerSearch
                         serverId={serverId}
