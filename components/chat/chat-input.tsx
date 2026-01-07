@@ -7,6 +7,7 @@ import { Form, FormControl, FormField, FormItem } from '../ui/form'
 import { Plus, SmilePlusIcon } from 'lucide-react'
 import qs from "query-string"
 import axios from 'axios'
+import { useModal } from '@/hooks/use-mode-store'
 
 interface ChatInputProps {
     apiUrl: string,
@@ -20,6 +21,7 @@ const formSchema = z.object({
 })
 
 const ChatInput = ({ apiUrl, query, name, type }: ChatInputProps) => {
+    const { onOpen } = useModal()
     const form = useForm<z.infer<typeof formSchema>>(
         {
             resolver: zodResolver(formSchema),
@@ -52,7 +54,7 @@ const ChatInput = ({ apiUrl, query, name, type }: ChatInputProps) => {
                     <FormItem className='w-full'>
                         <FormControl>
                             <div className='flex items-center gap-2 w-full'>
-                                <button type='button' className='h-10 w-10 rounded-md bg-card flex items-center justify-center'>
+                                <button type='button' className='h-10 w-10 rounded-md bg-card flex items-center justify-center' onClick={() => onOpen("messageFile", { apiUrl, query })}>
                                     <Plus className='h-5 w-5' />
                                 </button>
                                 <input type="text" className='bg-card p-2 rounded-md relative w-full' placeholder={`Message ${type === "conversation" ? name : "#" + name}`} {...field} disabled={isLoading} />

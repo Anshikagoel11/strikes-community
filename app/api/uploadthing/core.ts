@@ -20,6 +20,15 @@ export const ourFileRouter = {
         .onUploadComplete(async ({ metadata }) => {
             return { uploadedBy: metadata.userId };
         }),
+    messageFile: f(["image", "pdf"])
+        .middleware(async () => {
+            const { userId } = await auth();
+            if (!userId) throw new UploadThingError("Unauthorized");
+            return { userId: userId };
+        })
+        .onUploadComplete(async ({ metadata }) => {
+            return { uploadedBy: metadata.userId };
+        }),
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof ourFileRouter;
