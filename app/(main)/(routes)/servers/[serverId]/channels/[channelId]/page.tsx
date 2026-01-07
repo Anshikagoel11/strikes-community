@@ -45,7 +45,7 @@ const ChannelPage = async ({ params }: { params: Promise<{ channelId: string, se
           paramValue={channelId}
         />
       </div>
-      <div className='border-t bg-muted p-4'>
+      <div className='border-t bg-secondary p-4'>
         <ChatInput
           name={channel.name}
           type={"channel"}

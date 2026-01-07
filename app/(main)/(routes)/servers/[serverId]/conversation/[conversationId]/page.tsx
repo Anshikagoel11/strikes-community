@@ -43,7 +43,7 @@ const ConversationPage = async ({ params }: { params: Promise<{ conversationId: 
                 <div className='p-4'>Future Messages</div>
             </div>
 
-            <div className='border-t bg-muted p-4'>
+            <div className='border-t bg-secondary p-4'>
                 <ChatInput
                     name={otherMember.profile.name}
                     type={"conversation"}

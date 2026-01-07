@@ -55,10 +55,10 @@ const ChatInput = ({ apiUrl, query, name, type }: ChatInputProps) => {
                     <FormItem className='w-full'>
                         <FormControl>
                             <div className='flex items-center gap-2 w-full'>
-                                <button type='button' className='h-10 w-10 rounded-md bg-card flex items-center justify-center' onClick={() => onOpen("messageFile", { apiUrl, query })}>
-                                    <Plus className='h-5 w-5' />
+                                <button type='button' className='h-10 w-10 rounded-md bg-card flex items-center justify-center hover:bg-zinc-200 dark:hover:bg-zinc-700 transition' onClick={() => onOpen("messageFile", { apiUrl, query })}>
+                                    <Plus className='text-zinc-500 dark:text-zinc-400' />
                                 </button>
-                                <input type="text" className='bg-card p-2 rounded-md relative w-full' placeholder={`Message ${type === "conversation" ? name : "#" + name}`} {...field} disabled={isLoading} />
+                                <input type="text" className='bg-card p-2 rounded-md relative w-full' placeholder={`Message ${type === "conversation" ? name : "#" + name}`} {...field} disabled={isLoading} autoComplete="off" />
                                 <EmojiPicker onChange={(emoji: string) => field.onChange(`${field.value} ${emoji}`)} />
 
                             </div>

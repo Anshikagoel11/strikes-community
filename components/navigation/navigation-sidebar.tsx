@@ -25,7 +25,7 @@ const NavigationSidebar = async () => {
     })
 
     return (
-        <nav aria-label="Server sidebar" className='flex flex-col items-center h-full text-primary bg-secondary py-3'>
+        <nav aria-label="Server sidebar" className='flex flex-col items-center h-full text-primary bg-secondary py-3 border-r'>
             <div className='flex flex-col items-center w-full space-y-4'>
                 <NavigationAction />
                 <Separator className="bg-muted-foreground/20 rounded-md w-10 mx-auto mb-2" />
@@ -50,7 +50,7 @@ const NavigationSidebar = async () => {
                 <div className='mt-2 flex items-center flex-col gap-y-3'>
                     <ModeToggle />
                     <div className='w-full flex justify-center'>
-                        <UserButton/>
+                        <UserButton />
                     </div>
                 </div>
             </div>
