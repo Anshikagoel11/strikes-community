@@ -88,9 +88,6 @@ const ChatItem = ({ id, content, member, timestamp, fileUrl, deleted, currentMem
         })
     }, [content, form])
 
-    useEffect(() => {
-        setHasError(false);
-    }, [fileUrl]);
 
     const fileType = fileUrl?.split(".").pop()
 
@@ -147,7 +144,7 @@ const ChatItem = ({ id, content, member, timestamp, fileUrl, deleted, currentMem
                                 rel="noopener noreferrer"
                                 className="ml-2 text-sm text-indigo-500 dark:text-indigo-400 hover:underline"
                             >
-                                {isPDF ? "PDF File" : "Image File"}
+                                {isPDF ? `PDF File (${content})` : `Open File (${content})`}
                             </a>
                         </div>
                     )}

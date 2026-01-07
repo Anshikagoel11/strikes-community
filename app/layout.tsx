@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Discord",
-  description: "A social media application",
+  title: "Nexus | Platform for conversation",
+  description: "Nexus is great for conversations and chilling with friends, or even building a worldwide community. Customize your own space to talk, play, and hang out.",
 };
 
 export default function RootLayout({
