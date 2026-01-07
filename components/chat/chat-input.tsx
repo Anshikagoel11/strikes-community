@@ -4,10 +4,11 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import z from "zod"
 import { Form, FormControl, FormField, FormItem } from '../ui/form'
-import { Plus, SmilePlusIcon } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import qs from "query-string"
 import axios from 'axios'
 import { useModal } from '@/hooks/use-mode-store'
+import EmojiPicker from '../emoji-picker'
 
 interface ChatInputProps {
     apiUrl: string,
@@ -58,9 +59,7 @@ const ChatInput = ({ apiUrl, query, name, type }: ChatInputProps) => {
                                     <Plus className='h-5 w-5' />
                                 </button>
                                 <input type="text" className='bg-card p-2 rounded-md relative w-full' placeholder={`Message ${type === "conversation" ? name : "#" + name}`} {...field} disabled={isLoading} />
-                                <button type='button' className='h-10 w-10 rounded-md bg-card flex items-center justify-center'>
-                                    <SmilePlusIcon className='h-5 w-5' />
-                                </button>
+                                <EmojiPicker onChange={(emoji: string) => field.onChange(`${field.value} ${emoji}`)} />
 
                             </div>
                         </FormControl>

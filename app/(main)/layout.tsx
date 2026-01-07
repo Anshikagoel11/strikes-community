@@ -1,5 +1,6 @@
 import NavigationSidebar from "@/components/navigation/navigation-sidebar";
 import { ModalProvider } from "@/components/providers/modal-provider";
+import { QueryProvider } from "@/components/providers/query-provider";
 import { SocketProvider } from "@/components/providers/socket-provider";
 
 const MainLayout = async ({ children }: { children: React.ReactNode }) => {
@@ -11,7 +12,9 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
             <main className="md:ml-18 flex-1 min-h-screen flex flex-col">
                 <SocketProvider>
                     <ModalProvider />
-                    {children}
+                    <QueryProvider>
+                        {children}
+                    </QueryProvider>
                 </SocketProvider>
             </main>
         </div>

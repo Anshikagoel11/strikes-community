@@ -1,21 +1,16 @@
 "use client"
 import type { Member, Profile, Server } from '@/lib/generated/prisma/client'
-import { ShieldAlert, ShieldCheck } from 'lucide-react'
 
 import UserAvatar from '../user-avatar'
 import { Tooltip, TooltipTrigger } from '../ui/tooltip'
 import { useRouter } from 'next/navigation'
+import { roleIconMap } from '@/constants/roleIconMap'
 
 interface ServerMemberProps {
     member: Member & { profile: Profile }
     server: Server
 }
 
-const roleIconMap = {
-    GUEST: null,
-    MODERATOR: <ShieldCheck className='h-4 w-4' />,
-    ADMIN: <ShieldAlert className='h-4 w-4 text-rose-500' />
-}
 
 const ServerMember = ({ member, server }: ServerMemberProps) => {
     const icon = roleIconMap[member.role];

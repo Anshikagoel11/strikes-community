@@ -1,5 +1,6 @@
 import ChatHeader from "@/components/chat/chat-header";
 import ChatInput from "@/components/chat/chat-input";
+import ChatMessages from "@/components/chat/chat-messages";
 import { CurrentProfile } from "@/lib/current-profile";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
@@ -31,7 +32,19 @@ const ChannelPage = async ({ params }: { params: Promise<{ channelId: string, se
   return (
     <div className="flex flex-col min-h-screen">
       <ChatHeader name={channel.name} serverId={channel.serverId} type="channel" />
-      <div className='flex-1 overflow-y-auto p-4'>Future Messages</div>
+      <div className='flex-1 overflow-y-auto p-4'>
+        <ChatMessages
+          member={member}
+          chatId={channelId}
+          name={channel.name}
+          type="channel"
+          apiUrl="/api/messages"
+          socketUrl="api/socket/messages"
+          socketQuery={{ channelId: channelId, serverId: serverId }}
+          paramKey="channelId"
+          paramValue={channelId}
+        />
+      </div>
       <div className='border-t bg-muted p-4'>
         <ChatInput
           name={channel.name}
