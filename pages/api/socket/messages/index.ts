@@ -13,7 +13,7 @@ type NextApiResponseWithSocket = NextApiResponse & {
 
 export default async function handler(
     req: NextApiRequest,
-    res: NextApiResponseWithSocket
+    res: NextApiResponseWithSocket,
 ) {
     if (req.method != "POST") {
         return res.status(405).json({ error: "method not allowed" });
@@ -59,7 +59,7 @@ export default async function handler(
         }
 
         const member = server.members.find(
-            (member) => member.profileId === profile.id
+            (member) => member.profileId === profile.id,
         );
         if (!member) {
             return res.status(404).json({ message: "member not found" });
@@ -80,7 +80,7 @@ export default async function handler(
             },
         });
         const channelKey = `chat:${channelId}:messages`;
-        res?.socket?.server?.io?.emit(channelKey, message); 
+        res?.socket?.server?.io?.emit(channelKey, message);
         return res.status(200).json(message);
     } catch (error) {
         console.log("messages_post", error);

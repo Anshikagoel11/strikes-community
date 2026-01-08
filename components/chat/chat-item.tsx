@@ -18,6 +18,7 @@ import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { useModal } from '@/hooks/use-mode-store'
 import { roleIconMap } from '@/constants/roleIconMap'
+import { useRouter, useParams } from 'next/navigation'
 
 interface ChatItemProps {
     id: string,
@@ -43,6 +44,9 @@ const formSchema = z.object({
 const ChatItem = ({ id, content, member, timestamp, fileUrl, deleted, currentMember, isUpdated, socketUrl, socketQuery }: ChatItemProps) => {
     const [isEditing, setIsEditing] = useState(false);
     const [hasError, setHasError] = useState(false);
+    const params = useParams()
+    const router = useRouter()
+
     const { onOpen } = useModal();
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -70,9 +74,16 @@ const ChatItem = ({ id, content, member, timestamp, fileUrl, deleted, currentMem
         }
     }
 
+    function onMemberClick() {
+        if (member.id === currentMember.id) {
+            return
+        }
+        router.push(`/servers/${params?.serverId}/conversation/${member.id}`)
+    }
+
     useEffect(() => {
-        const handleKeyDown = (event: any) => {
-            if (event.key === "Escape" || event.keyCode === 27) {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "Escape") {
                 setIsEditing(false);
             }
         };
@@ -102,13 +113,13 @@ const ChatItem = ({ id, content, member, timestamp, fileUrl, deleted, currentMem
     return (
         <div className="relative group flex items-center p-4 transition w-full hover:bg-black/5 dark:hover:bg-zinc-900/50">
             <div className="group flex gap-x-2 items-start w-full">
-                <div onClick={() => { }} className="cursor-pointer hover:drop-shadow-md transition">
+                <div onClick={onMemberClick} className="cursor-pointer hover:drop-shadow-md transition">
                     <UserAvatar src={member.profile.imageUrl} />
                 </div>
                 <div className="flex flex-col w-full">
                     <div className="flex items-center gap-x-2">
                         <div className="flex items-center">
-                            <p onClick={() => { }} className="font-semibold text-sm hover:underline cursor-pointer">
+                            <p onClick={onMemberClick} className="font-semibold text-sm hover:underline cursor-pointer">
                                 {member.profile.name}
                             </p>
                             <ActionTooltip label={member.role}>
@@ -144,7 +155,7 @@ const ChatItem = ({ id, content, member, timestamp, fileUrl, deleted, currentMem
                                 rel="noopener noreferrer"
                                 className="ml-2 text-sm text-indigo-500 dark:text-indigo-400 hover:underline"
                             >
-                                {isPDF ? `PDF File (${content})` : `Open File (${content})`}
+                                {isPDF ? `PDF File` : `Open File`}
                             </a>
                         </div>
                     )}
