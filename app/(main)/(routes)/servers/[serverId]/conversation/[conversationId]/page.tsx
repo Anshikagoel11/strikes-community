@@ -1,5 +1,6 @@
 import ChatHeader from '@/components/chat/chat-header';
 import ChatInput from '@/components/chat/chat-input';
+import ChatMessages from '@/components/chat/chat-messages';
 import { getOrCreateConversation } from '@/lib/conversation';
 import { CurrentProfile } from '@/lib/current-profile'
 import { prisma } from '@/lib/prisma';
@@ -31,7 +32,7 @@ const ConversationPage = async ({ params }: { params: Promise<{ conversationId: 
     const otherMember = memberOne.profileId === profile.id ? memberTwo : memberOne
 
     return (
-        <div className='flex flex-col min-h-screen'>
+        <div className='flex flex-col h-screen'>
             <ChatHeader
                 imageUrl={otherMember.profile.imageUrl}
                 name={otherMember.profile.name}
@@ -40,16 +41,26 @@ const ConversationPage = async ({ params }: { params: Promise<{ conversationId: 
             />
 
             <div className='flex-1 overflow-y-auto'>
-                <div className='p-4'>Future Messages</div>
+                <ChatMessages
+                    member={currentMember}
+                    name={otherMember.profile.name}
+                    chatId={otherMember.profile.id}
+                    type="conversation"
+                    apiUrl="/api/direct-messages"
+                    paramKey="conversationId"
+                    paramValue={conversation.id}
+                    socketUrl="/api/socket/direct-messages"
+                    socketQuery={{ conversationId: conversation.id }}
+                />
             </div>
 
             <div className='border-t bg-secondary p-4'>
                 <ChatInput
                     name={otherMember.profile.name}
                     type={"conversation"}
-                    apiUrl={"/api/socket/messages"}
+                    apiUrl={"/api/socket/direct-messages"}
                     query={{
-                        serverId: serverId
+                        conversationId: conversation.id
                     }}
                 />
             </div>

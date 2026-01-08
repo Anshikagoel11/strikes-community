@@ -134,7 +134,7 @@ export const MessageScalarFieldEnum = {
   memberId: 'memberId',
   channelId: 'channelId',
   deleted: 'deleted',
-  createAt: 'createAt',
+  createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 

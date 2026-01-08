@@ -30,9 +30,9 @@ const ChannelPage = async ({ params }: { params: Promise<{ channelId: string, se
 
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col h-screen">
       <ChatHeader name={channel.name} serverId={channel.serverId} type="channel" />
-      <div className='flex-1 overflow-y-auto p-4'>
+      <div className='flex-1 overflow-y-auto'>
         <ChatMessages
           member={member}
           chatId={channelId}

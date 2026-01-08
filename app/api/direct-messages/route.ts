@@ -1,6 +1,6 @@
 import { CurrentProfile } from "@/lib/current-profile";
 import { NextResponse } from "next/server";
-import { Message } from "@/lib/generated/prisma/client";
+import { DirectMessage } from "@/lib/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 
 const MESSAGE_BATCH = 10;
@@ -10,26 +10,28 @@ export async function GET(req: Request) {
         const profile = await CurrentProfile();
         const { searchParams } = new URL(req.url);
         const cursor = searchParams.get("cursor");
-        const channelId = searchParams.get("channelId");
+        const conversationId = searchParams.get("conversationId");
 
         if (!profile) {
             return new NextResponse("unauthorized", { status: 400 });
         }
 
-        if (!channelId) {
-            return new NextResponse("channel id is missing", { status: 401 });
+        if (!conversationId) {
+            return new NextResponse("conversation id is missing", {
+                status: 401,
+            });
         }
-        let messages: Message[] = [];
+        let messages: DirectMessage[] = [];
 
         if (cursor) {
-            messages = await prisma.message.findMany({
+            messages = await prisma.directMessage.findMany({
                 take: MESSAGE_BATCH,
                 skip: 1,
                 cursor: {
                     id: cursor,
                 },
                 where: {
-                    channelId,
+                    conversationId,
                 },
                 include: {
                     member: {
@@ -43,10 +45,10 @@ export async function GET(req: Request) {
                 },
             });
         } else {
-            messages = await prisma.message.findMany({
+            messages = await prisma.directMessage.findMany({
                 take: MESSAGE_BATCH,
                 where: {
-                    channelId,
+                    conversationId,
                 },
                 include: {
                     member: {
@@ -69,7 +71,7 @@ export async function GET(req: Request) {
             nextCursor,
         });
     } catch (error) {
-        console.log("message_error", error);
+        console.log("direct_messages_error", error);
         return new NextResponse("internal server error", { status: 500 });
     }
 }

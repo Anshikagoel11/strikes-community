@@ -3,10 +3,13 @@
 import { type Member, type Message, type Profile } from "@/lib/generated/prisma/client"
 import ChatWelcome from "./chat-welcome"
 import { useChatQuery } from "@/hooks/use-chat-query"
-import { Loader2, ServerCrash } from "lucide-react"
-import { Fragment } from "react"
+import { Loader2, ServerCrash, ChevronUp } from "lucide-react"
+import { Fragment, useRef, ElementRef } from "react"
 import ChatItem from "./chat-item"
 import { format } from "date-fns"
+import { useChatSocket } from "@/hooks/use-chat-socket"
+import { useChatScroll } from "@/hooks/use-chat-scroll"
+import { Button } from "@/components/ui/button"
 
 const DATE_FORMAT = 'd MMM yyyy, HH:mm'
 
@@ -30,7 +33,22 @@ type MessageWithMemberProfile = Message & {
 
 const ChatMessages = ({ name, member, chatId, apiUrl, socketUrl, socketQuery, paramKey, paramValue, type }: ChatMessagesProps) => {
     const queryKey = `chat:${chatId}`
+    const addKey = `chat:${chatId}:messages`
+    const updateKey = `chat:${chatId}:messages:update`
+
+    const chatRef = useRef<ElementRef<"div">>(null)
+    const bottomRef = useRef<ElementRef<"div">>(null)
+
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useChatQuery({ apiUrl, paramKey, paramValue, queryKey })
+
+    useChatSocket({ queryKey, addKey, updateKey })
+    useChatScroll({
+        bottomRef: bottomRef as React.RefObject<HTMLDivElement>,
+        chatRef: chatRef as React.RefObject<HTMLDivElement>,
+        count: data?.pages?.[0].items.length ?? 0,
+        loadMore: fetchNextPage,
+        shouldLoadMore: !isFetchingNextPage && !!hasNextPage
+    })
 
     if (status === "pending") {
         return (
@@ -49,10 +67,32 @@ const ChatMessages = ({ name, member, chatId, apiUrl, socketUrl, socketQuery, pa
     }
 
     return (
-        <div className="flex flex-1 flex-col py-4 overflow-y-auto">
+        <div ref={chatRef} className="flex flex-1 flex-col py-4 overflow-y-auto">
             <div className="flex-1">
-                <ChatWelcome type={type} name={name} />
-
+                {!hasNextPage && (<ChatWelcome type={type} name={name} />)}
+                {hasNextPage && (
+                    <div className="flex justify-center mb-4">
+                        <Button
+                            onClick={() => fetchNextPage()}
+                            disabled={isFetchingNextPage}
+                            variant="ghost"
+                            size="sm"
+                            className="gap-2"
+                        >
+                            {isFetchingNextPage ? (
+                                <>
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                    <span>Loading messages...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <ChevronUp className="h-4 w-4" />
+                                    <span>Load previous messages</span>
+                                </>
+                            )}
+                        </Button>
+                    </div>
+                )}
                 {/* messages */}
                 <div className="flex flex-col-reverse mt-auto">
                     {data?.pages?.map((group, i) => (
@@ -64,8 +104,8 @@ const ChatMessages = ({ name, member, chatId, apiUrl, socketUrl, socketQuery, pa
                                     currentMember={member}
                                     fileUrl={message.fileUrl}
                                     deleted={message.deleted}
-                                    timestamp={format(new Date(message.createAt), DATE_FORMAT)}
-                                    isUpdated={message.createAt != message.updatedAt}
+                                    timestamp={format(new Date(message.createdAt), DATE_FORMAT)}
+                                    isUpdated={new Date(message.createdAt).getTime() !== new Date(message.updatedAt).getTime()}
                                     socketUrl={socketUrl}
                                     socketQuery={socketQuery}
                                     member={message.member}
@@ -75,7 +115,8 @@ const ChatMessages = ({ name, member, chatId, apiUrl, socketUrl, socketQuery, pa
                     ))}
                 </div>
             </div>
-        </div>
+            <div ref={bottomRef} />
+        </div >
     )
 }
 
