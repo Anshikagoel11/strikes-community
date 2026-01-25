@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import type { Server as SocketServer } from "socket.io";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getProducer } from "@/lib/kafka/producer";
+import { getSessionManager } from "@/lib/redis/session-manager";
 import { v4 as uuidv4 } from "uuid";
 
 type NextApiResponseWithSocket = NextApiResponse & {
@@ -74,20 +75,22 @@ export default async function handler(
         // Publish to Kafka (fire-and-forget for low latency)
         // Consumer will handle database persistence in batches
         const producer = getProducer();
-        producer.publishMessage({
-            id: messageId,
-            content,
-            fileUrl,
-            channelId: channelId as string,
-            memberId: member.id,
-            serverId: serverId as string,
-            timestamp,
-        }).catch((error) => {
-            console.error("⚠️ Kafka publish failed (non-blocking):", error);
-            // Don't fail the request - message will still be emitted via Socket.io
-        });
+        producer
+            .publishMessage({
+                id: messageId,
+                content,
+                fileUrl,
+                channelId: channelId as string,
+                memberId: member.id,
+                serverId: serverId as string,
+                timestamp,
+            })
+            .catch((error) => {
+                console.error("⚠️ Kafka publish failed (non-blocking):", error);
+                // Don't fail the request - message will still be emitted via Socket.io
+            });
 
-        // Immediately emit to Socket.io for real-time delivery
+        // Emit to Socket.io for real-time delivery (only to online users)
         const messageForEmit = {
             id: messageId,
             content,
@@ -113,7 +116,31 @@ export default async function handler(
         };
 
         const channelKey = `chat:${channelId}:messages`;
-        res?.socket?.server?.io?.emit(channelKey, messageForEmit);
+        const sessionManager = getSessionManager();
+
+        // Get all members in this server and check who's online
+        for (const serverMember of server.members) {
+            try {
+                const memberProfile = await prisma.profile.findUnique({
+                    where: { id: serverMember.profileId },
+                });
+
+                if (memberProfile) {
+                    const session = await sessionManager.getUserSession(
+                        memberProfile.userId,
+                    );
+                    if (session && session.socketId) {
+                        // User is online - emit to their specific socket
+                        res?.socket?.server?.io
+                            ?.to(session.socketId)
+                            .emit(channelKey, messageForEmit);
+                    }
+                }
+            } catch (error) {
+                // Skip if Redis is unavailable or profile not found
+                continue;
+            }
+        }
 
         return res.status(200).json(messageForEmit);
     } catch (error) {

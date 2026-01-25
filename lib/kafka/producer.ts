@@ -12,13 +12,6 @@ export interface ChatMessage {
     serverId?: string;
 }
 
-export interface MessageAck {
-    messageId: string;
-    status: "sent" | "delivered" | "read";
-    userId: string;
-    timestamp: number;
-}
-
 export class MessageProducer {
     private producer: Producer;
     private isConnected = false;
@@ -47,7 +40,6 @@ export class MessageProducer {
         if (this.isConnected) {
             await this.producer.disconnect();
             this.isConnected = false;
-            console.log("🔌 Kafka Producer disconnected");
         }
     }
 
@@ -77,101 +69,9 @@ export class MessageProducer {
                 ],
             });
 
-            console.log(`📤 Message published: ${message.id} to ${topic}`);
             return message.id;
         } catch (error) {
             console.error("❌ Failed to publish message:", error);
-            throw error;
-        }
-    }
-
-    /**
-     * Publish message acknowledgment
-     */
-    async publishAck(ack: MessageAck): Promise<void> {
-        await this.connect();
-
-        try {
-            await this.producer.send({
-                topic: TOPICS.MESSAGE_ACKNOWLEDGMENTS,
-                messages: [
-                    {
-                        key: ack.messageId,
-                        value: JSON.stringify(ack),
-                        headers: {
-                            "ack-type": ack.status,
-                        },
-                    },
-                ],
-            });
-
-            console.log(`✅ Ack published: ${ack.messageId} - ${ack.status}`);
-        } catch (error) {
-            console.error("❌ Failed to publish ack:", error);
-            throw error;
-        }
-    }
-
-    /**
-     * Publish message edit event
-     */
-    async publishMessageEdit(
-        messageId: string,
-        newContent: string,
-        editedBy: string,
-    ): Promise<void> {
-        await this.connect();
-
-        try {
-            await this.producer.send({
-                topic: TOPICS.MESSAGE_EDITS,
-                messages: [
-                    {
-                        key: messageId,
-                        value: JSON.stringify({
-                            messageId,
-                            newContent,
-                            editedBy,
-                            timestamp: Date.now(),
-                        }),
-                    },
-                ],
-            });
-
-            console.log(`✏️ Message edit published: ${messageId}`);
-        } catch (error) {
-            console.error("❌ Failed to publish edit:", error);
-            throw error;
-        }
-    }
-
-    /**
-     * Publish message delete event
-     */
-    async publishMessageDelete(
-        messageId: string,
-        deletedBy: string,
-    ): Promise<void> {
-        await this.connect();
-
-        try {
-            await this.producer.send({
-                topic: TOPICS.MESSAGE_DELETES,
-                messages: [
-                    {
-                        key: messageId,
-                        value: JSON.stringify({
-                            messageId,
-                            deletedBy,
-                            timestamp: Date.now(),
-                        }),
-                    },
-                ],
-            });
-
-            console.log(`🗑️ Message delete published: ${messageId}`);
-        } catch (error) {
-            console.error("❌ Failed to publish delete:", error);
             throw error;
         }
     }

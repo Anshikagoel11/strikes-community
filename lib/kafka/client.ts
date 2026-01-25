@@ -1,4 +1,42 @@
 import { Kafka, logLevel } from "kafkajs";
+import { readFileSync } from "fs";
+import { resolve, dirname } from "path";
+import { fileURLToPath } from "url";
+
+// Get current directory for Bun compatibility
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Load CA certificate from file
+let caCert: Buffer | undefined;
+try {
+    // Try multiple possible paths
+    const possiblePaths = [
+        resolve(__dirname, "../../certificate/ca.pem"),
+        resolve(process.cwd(), "certificate/ca.pem"),
+    ];
+
+    for (const path of possiblePaths) {
+        try {
+            caCert = readFileSync(path);
+            console.log(`✅ CA certificate loaded`);
+            break;
+        } catch {
+            continue;
+        }
+    }
+
+    if (!caCert) {
+        throw new Error("CA certificate not found in any expected location");
+    }
+} catch (error) {
+    console.warn(
+        "⚠️ CA certificate not found. Using insecure connection (dev only)",
+    );
+    console.warn(
+        `Error: ${error instanceof Error ? error.message : String(error)}`,
+    );
+}
 
 // Kafka client configuration (Aiven)
 export const kafka = new Kafka({
@@ -8,22 +46,25 @@ export const kafka = new Kafka({
             "discord-project-dicord.c.aivencloud.com:23563",
     ],
     sasl: {
-        mechanism: "scram-sha-256", // Aiven uses SCRAM-SHA-256, not plain
+        mechanism: "scram-sha-256", // Aiven uses SCRAM-SHA-256
         username: process.env.KAFKA_USERNAME!,
         password: process.env.KAFKA_PASSWORD!,
     },
-    ssl: {
-        rejectUnauthorized: false, // Disable for Aiven self-signed certs (dev only)
-        // For production, download CA cert from Aiven and use:
-        // ca: [fs.readFileSync('./ca.pem', 'utf-8')]
-    },
-    logLevel: logLevel.INFO, // Change to INFO for debugging
+    ssl: caCert
+        ? {
+              rejectUnauthorized: true,
+              ca: [caCert],
+          }
+        : {
+              rejectUnauthorized: false, // Fallback: disable cert validation (dev only)
+          },
+    logLevel: logLevel.ERROR,
     retry: {
-        initialRetryTime: 300,
-        retries: 8,
+        initialRetryTime: 100,
+        retries: 10,
         maxRetryTime: 30000,
     },
-    connectionTimeout: 30000,
+    connectionTimeout: 10000,
     requestTimeout: 30000,
 });
 
@@ -31,10 +72,6 @@ export const kafka = new Kafka({
 export const TOPICS = {
     MESSAGES: "chat-messages",
     DIRECT_MESSAGES: "direct-messages",
-    MESSAGE_ACKNOWLEDGMENTS: "message-acks",
-    USER_PRESENCE: "user-presence",
-    MESSAGE_EDITS: "message-edits",
-    MESSAGE_DELETES: "message-deletes",
 } as const;
 
 // Topic configurations (minimal config for Aiven free tier)
@@ -46,14 +83,6 @@ export const TOPIC_CONFIGS = {
         // No custom configEntries - use Aiven defaults
     },
     [TOPICS.DIRECT_MESSAGES]: {
-        numPartitions: 1,
-        replicationFactor: 1,
-    },
-    [TOPICS.MESSAGE_ACKNOWLEDGMENTS]: {
-        numPartitions: 1,
-        replicationFactor: 1,
-    },
-    [TOPICS.USER_PRESENCE]: {
         numPartitions: 1,
         replicationFactor: 1,
     },

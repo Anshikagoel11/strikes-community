@@ -3,6 +3,7 @@ import { NextApiResponseServerIo } from "@/types/types";
 import { CurrentProfilePages } from "@/lib/current-profile-pages";
 import { prisma } from "@/lib/prisma";
 import { MemberRole } from "@/lib/generated/prisma/enums";
+import { getSessionManager } from "@/lib/redis/session-manager";
 
 export default async function handler(
     req: NextApiRequest,
@@ -140,7 +141,28 @@ export default async function handler(
             });
         }
         const updateKey = `chat:${conversation.id}:messages:update`;
-        res?.socket?.server?.io?.emit(updateKey, directMessage);
+        const sessionManager = getSessionManager();
+
+        // Find the recipient (the other person in the conversation)
+        const recipient =
+            conversation.memberOne.profileId === profile.id
+                ? conversation.memberTwo
+                : conversation.memberOne;
+
+        // Emit only to recipient if they're online
+        try {
+            const recipientSession = await sessionManager.getUserSession(
+                recipient.profile.userId,
+            );
+            if (recipientSession && recipientSession.socketId) {
+                res?.socket?.server?.io
+                    ?.to(recipientSession.socketId)
+                    .emit(updateKey, directMessage);
+            }
+        } catch (error) {
+            // Redis unavailable - skip
+        }
+
         return res.status(200).json(directMessage);
     } catch (error) {
         console.log("message_error", error);

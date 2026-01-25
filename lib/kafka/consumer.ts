@@ -1,7 +1,6 @@
 import { kafka, TOPICS } from "./client";
 import { prisma } from "@/lib/prisma";
 import type { Consumer, EachMessagePayload } from "kafkajs";
-import { SessionManager } from "@/lib/redis/session-manager";
 
 interface KafkaMessage {
     id: string;
@@ -16,7 +15,6 @@ interface KafkaMessage {
 
 export class MessageConsumer {
     private consumer: Consumer;
-    private sessionManager: SessionManager;
     private messageBuffer: KafkaMessage[] = [];
     private directMessageBuffer: KafkaMessage[] = [];
     private readonly BATCH_SIZE = 500;
@@ -32,18 +30,16 @@ export class MessageConsumer {
             maxBytes: 10485760, // 10MB
             maxWaitTimeInMs: 1000,
         });
-        this.sessionManager = new SessionManager();
     }
 
     async start() {
         if (this.isRunning) {
-            console.log("⚠️ Consumer already running");
             return;
         }
 
         try {
             await this.consumer.connect();
-            console.log("✅ Kafka Consumer connected");
+            console.log("✅ Connected to Kafka");
 
             await this.consumer.subscribe({
                 topics: [TOPICS.MESSAGES, TOPICS.DIRECT_MESSAGES],
@@ -58,8 +54,6 @@ export class MessageConsumer {
 
             this.isRunning = true;
             this.startBatchTimer();
-
-            console.log("🚀 Message consumer started");
         } catch (error) {
             console.error("❌ Failed to start consumer:", error);
             throw error;
@@ -80,7 +74,7 @@ export class MessageConsumer {
 
         await this.consumer.disconnect();
         this.isRunning = false;
-        console.log("🛑 Message consumer stopped");
+        console.log("\n✅ Consumer stopped");
     }
 
     private async handleMessage({ topic, message }: EachMessagePayload) {
@@ -101,9 +95,6 @@ export class MessageConsumer {
             ) {
                 await this.processBatch();
             }
-
-            // Deliver to online users immediately (real-time)
-            await this.deliverRealtime(data);
         } catch (error) {
             console.error("❌ Failed to handle message:", error);
             // Message will be retried automatically by Kafka
@@ -146,9 +137,6 @@ export class MessageConsumer {
                         })),
                         skipDuplicates: true,
                     });
-                    console.log(
-                        `✅ Batch processed: ${messageBatch.length} channel messages`,
-                    );
                 } catch (error: unknown) {
                     // Handle foreign key violations (test data, deleted members, etc.)
                     if (
@@ -168,9 +156,6 @@ export class MessageConsumer {
                                 data: validMessages,
                                 skipDuplicates: true,
                             });
-                            console.log(
-                                `✅ Batch processed: ${validMessages.length}/${messageBatch.length} valid messages`,
-                            );
                         }
                     } else {
                         throw error; // Re-throw other errors
@@ -193,9 +178,6 @@ export class MessageConsumer {
                         })),
                         skipDuplicates: true,
                     });
-                    console.log(
-                        `✅ Batch processed: ${dmBatch.length} direct messages`,
-                    );
                 } catch (error: unknown) {
                     if (
                         error &&
@@ -213,9 +195,6 @@ export class MessageConsumer {
                                 data: validMessages,
                                 skipDuplicates: true,
                             });
-                            console.log(
-                                `✅ Batch processed: ${validMessages.length}/${dmBatch.length} valid DMs`,
-                            );
                         }
                     } else {
                         throw error;
@@ -224,91 +203,23 @@ export class MessageConsumer {
             }
 
             const duration = Date.now() - startTime;
-            console.log(`⏱️ Batch processing took ${duration}ms`);
+
+            // Log only if there were messages processed
+            if (messageBatch.length > 0 || dmBatch.length > 0) {
+                const total = messageBatch.length + dmBatch.length;
+                console.log(
+                    `Processed ${total} message${total !== 1 ? "s" : ""} (${duration}ms)`,
+                );
+            }
+
+            // Commit offsets immediately after successful processing
+            await this.consumer.commitOffsets([]);
         } catch (error) {
             console.error("❌ Batch processing failed:", error);
 
             // Re-add failed messages back to buffer for retry
             this.messageBuffer.unshift(...messageBatch);
             this.directMessageBuffer.unshift(...dmBatch);
-        }
-    }
-
-    private async deliverRealtime(message: KafkaMessage) {
-        try {
-            // For channel messages, get all online members of that channel
-            if (message.channelId) {
-                const channel = await prisma.channel.findUnique({
-                    where: { id: message.channelId },
-                    include: {
-                        server: {
-                            include: {
-                                members: {
-                                    include: {
-                                        profile: true,
-                                    },
-                                },
-                            },
-                        },
-                    },
-                });
-
-                if (channel) {
-                    // Emit to all online members
-                    for (const member of channel.server.members) {
-                        try {
-                            const session =
-                                await this.sessionManager.getUserSession(
-                                    member.profile.userId,
-                                );
-                            if (session && session.socketId) {
-                                // This would require access to Socket.io instance
-                                // You'll need to pass this in or use a different pattern
-                                // For now, we'll just log
-                                console.log(
-                                    `📨 Would deliver to user ${member.profile.userId}`,
-                                );
-                            }
-                        } catch {
-                            // Skip if Redis is unavailable
-                            continue;
-                        }
-                    }
-                }
-            }
-
-            // For direct messages, find the recipient
-            if (message.conversationId) {
-                const conversation = await prisma.conversation.findUnique({
-                    where: { id: message.conversationId },
-                    include: {
-                        memberOne: { include: { profile: true } },
-                        memberTwo: { include: { profile: true } },
-                    },
-                });
-
-                if (conversation) {
-                    const recipient =
-                        conversation.memberOne.id === message.memberId
-                            ? conversation.memberTwo
-                            : conversation.memberOne;
-
-                    const recipientSession =
-                        await this.sessionManager.getUserSession(
-                            recipient.profile.userId,
-                        );
-
-                    if (recipientSession) {
-                        console.log(
-                            `📨 Would deliver DM to user ${recipient.profile.userId}`,
-                        );
-                        // Emit to recipient's socket
-                        // await this.sendAck(message.id, 'delivered');
-                    }
-                }
-            }
-        } catch (error) {
-            console.error("❌ Failed to deliver realtime:", error);
         }
     }
 

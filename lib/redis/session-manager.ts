@@ -39,7 +39,7 @@ export class SessionManager {
         );
 
         this.redis.on("connect", () => {
-            console.log("✅ Redis connected (SessionManager)");
+            console.log("✅ Redis connected");
         });
 
         this.redis.on("error", (error) => {

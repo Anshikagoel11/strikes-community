@@ -3,6 +3,7 @@ import { NextApiResponseServerIo } from "@/types/types";
 import { CurrentProfilePages } from "@/lib/current-profile-pages";
 import { prisma } from "@/lib/prisma";
 import { MemberRole } from "@/lib/generated/prisma/enums";
+import { getSessionManager } from "@/lib/redis/session-manager";
 
 export default async function handler(
     req: NextApiRequest,
@@ -131,7 +132,30 @@ export default async function handler(
             });
         }
         const updateKey = `chat:${channelId}:messages:update`;
-        res?.socket?.server?.io?.emit(updateKey, message);
+        const sessionManager = getSessionManager();
+
+        // Emit to online users in this channel
+        for (const serverMember of server.members) {
+            try {
+                const memberProfile = await prisma.profile.findUnique({
+                    where: { id: serverMember.profileId },
+                });
+
+                if (memberProfile) {
+                    const session = await sessionManager.getUserSession(
+                        memberProfile.userId,
+                    );
+                    if (session && session.socketId) {
+                        res?.socket?.server?.io
+                            ?.to(session.socketId)
+                            .emit(updateKey, message);
+                    }
+                }
+            } catch (error) {
+                continue;
+            }
+        }
+
         return res.status(200).json(message);
     } catch (error) {
         console.log("message_error", error);

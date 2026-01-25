@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import type { Server as SocketServer } from "socket.io";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getProducer } from "@/lib/kafka/producer";
+import { getSessionManager } from "@/lib/redis/session-manager";
 import { v4 as uuidv4 } from "uuid";
 
 type NextApiResponseWithSocket = NextApiResponse & {
@@ -83,17 +84,19 @@ export default async function handler(
 
         // Publish to Kafka (fire-and-forget for low latency)
         const producer = getProducer();
-        producer.publishMessage({
-            id: messageId,
-            content,
-            fileUrl,
-            conversationId: conversationId as string,
-            memberId: member.id,
-            timestamp,
-        }).catch((error) => {
-            console.error("⚠️ Kafka publish failed (non-blocking):", error);
-            // Don't fail the request - message will still be emitted via Socket.io
-        });
+        producer
+            .publishMessage({
+                id: messageId,
+                content,
+                fileUrl,
+                conversationId: conversationId as string,
+                memberId: member.id,
+                timestamp,
+            })
+            .catch((error) => {
+                console.error("⚠️ Kafka publish failed (non-blocking):", error);
+                // Don't fail the request - message will still be emitted via Socket.io
+            });
 
         // Immediately emit to Socket.io for real-time delivery
         const messageForEmit = {
@@ -121,7 +124,39 @@ export default async function handler(
         };
 
         const channelKey = `chat:${conversationId}:messages`;
-        res?.socket?.server?.io?.emit(channelKey, messageForEmit);
+        const sessionManager = getSessionManager();
+
+        // Find the recipient (the other person in the conversation)
+        const recipient =
+            conversation.memberOne.profileId === profile.id
+                ? conversation.memberTwo
+                : conversation.memberOne;
+
+        // Emit to both sender and recipient
+        try {
+            // Emit to sender (current user)
+            const senderSession = await sessionManager.getUserSession(
+                profile.userId,
+            );
+            if (senderSession && senderSession.socketId) {
+                res?.socket?.server?.io
+                    ?.to(senderSession.socketId)
+                    .emit(channelKey, messageForEmit);
+            }
+
+            // Emit to recipient
+            const recipientSession = await sessionManager.getUserSession(
+                recipient.profile.userId,
+            );
+            if (recipientSession && recipientSession.socketId) {
+                res?.socket?.server?.io
+                    ?.to(recipientSession.socketId)
+                    .emit(channelKey, messageForEmit);
+            }
+        } catch (error) {
+            console.error("⚠️ Redis check failed:", error);
+        }
+
         return res.status(200).json(messageForEmit);
     } catch (error) {
         console.log("direct_messages_post", error);

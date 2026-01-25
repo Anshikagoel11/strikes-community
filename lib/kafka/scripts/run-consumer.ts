@@ -5,16 +5,23 @@
  * Run this to start the message consumer in a separate process
  */
 
+import "dotenv/config";
 import { getConsumer } from "../consumer";
 
-async function runConsumer() {
-    console.log("🎯 Starting Kafka Message Consumer...\n");
+// Suppress KafkaJS TimeoutNegativeWarning
+process.removeAllListeners("warning");
+process.on("warning", (warning) => {
+    if (warning.name !== "TimeoutNegativeWarning") {
+        console.warn(warning);
+    }
+});
 
+async function runConsumer() {
+    console.log("Starting Kafka Consumer...\n");
     const consumer = getConsumer();
 
     // Graceful shutdown
     const shutdown = async () => {
-        console.log("\n⚠️ Shutting down consumer...");
         await consumer.stop();
         process.exit(0);
     };
@@ -30,18 +37,14 @@ async function runConsumer() {
             try {
                 const lag = await consumer.getLag();
                 if (lag > 1000) {
-                    console.warn(
-                        `⚠️ High consumer lag detected: ${lag} messages`,
-                    );
-                } else {
-                    console.log(`📊 Consumer lag: ${lag} messages`);
+                    console.warn(`⚠️  High lag: ${lag} messages`);
                 }
             } catch (error) {
                 console.error("❌ Failed to get lag:", error);
             }
         }, 30000);
 
-        console.log("✅ Consumer is running. Press Ctrl+C to stop.\n");
+        console.log("✅ Consumer running. Press Ctrl+C to stop.\n");
     } catch (error) {
         console.error("❌ Consumer failed to start:", error);
         process.exit(1);
