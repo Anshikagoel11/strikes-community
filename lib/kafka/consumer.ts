@@ -139,7 +139,7 @@ export class MessageConsumer {
                             id: msg.id,
                             content: msg.content,
                             memberId: msg.memberId,
-                            channelId: msg.channelId,
+                            channelId: msg.channelId!,
                             fileUrl: msg.fileUrl,
                             createdAt: new Date(msg.timestamp),
                             updatedAt: new Date(msg.timestamp),
@@ -186,7 +186,7 @@ export class MessageConsumer {
                             id: msg.id,
                             content: msg.content,
                             memberId: msg.memberId,
-                            conversationId: msg.conversationId,
+                            conversationId: msg.conversationId!,
                             fileUrl: msg.fileUrl,
                             createdAt: new Date(msg.timestamp),
                             updatedAt: new Date(msg.timestamp),
@@ -320,7 +320,7 @@ export class MessageConsumer {
             id: string;
             content: string;
             memberId: string;
-            channelId?: string;
+            channelId: string;
             fileUrl?: string;
             createdAt: Date;
             updatedAt: Date;
@@ -343,7 +343,7 @@ export class MessageConsumer {
                         id: msg.id,
                         content: msg.content,
                         memberId: msg.memberId,
-                        channelId: msg.channelId,
+                        channelId: msg.channelId!,
                         fileUrl: msg.fileUrl,
                         createdAt: new Date(msg.timestamp),
                         updatedAt: new Date(msg.timestamp),
@@ -369,7 +369,7 @@ export class MessageConsumer {
             id: string;
             content: string;
             memberId: string;
-            conversationId?: string;
+            conversationId: string;
             fileUrl?: string;
             createdAt: Date;
             updatedAt: Date;
@@ -391,9 +391,10 @@ export class MessageConsumer {
                         id: msg.id,
                         content: msg.content,
                         memberId: msg.memberId,
-                        conversationId: msg.conversationId,
+                        conversationId: msg.conversationId!,
                         fileUrl: msg.fileUrl,
                         createdAt: new Date(msg.timestamp),
+                        updatedAt: new Date(msg.timestamp),
                     });
                 } else {
                     console.warn(
@@ -412,19 +413,32 @@ export class MessageConsumer {
         const admin = kafka.admin();
         try {
             await admin.connect();
-            const offsets = await admin.fetchOffsets({
+
+            let totalLag = 0;
+
+            // Get consumer group offsets
+            const groupOffsets = await admin.fetchOffsets({
                 groupId: "message-processor",
                 topics: [TOPICS.MESSAGES, TOPICS.DIRECT_MESSAGES],
             });
 
-            let totalLag = 0;
-            for (const topic of offsets) {
-                for (const partition of topic.partitions) {
-                    const offset = partition.offset
+            // Get topic high watermarks
+            for (const topicOffset of groupOffsets) {
+                const topicOffsets = await admin.fetchTopicOffsets(
+                    topicOffset.topic,
+                );
+
+                for (const partition of topicOffset.partitions) {
+                    const consumerOffset = partition.offset
                         ? parseInt(partition.offset)
                         : 0;
-                    const high = partition.high ? parseInt(partition.high) : 0;
-                    totalLag += high - offset;
+                    const topicPartition = topicOffsets.find(
+                        (tp) => tp.partition === partition.partition,
+                    );
+                    const highWatermark = topicPartition?.high
+                        ? parseInt(topicPartition.high)
+                        : 0;
+                    totalLag += highWatermark - consumerOffset;
                 }
             }
 
