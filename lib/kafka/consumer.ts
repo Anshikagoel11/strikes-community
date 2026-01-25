@@ -3,11 +3,22 @@ import { prisma } from "@/lib/prisma";
 import type { Consumer, EachMessagePayload } from "kafkajs";
 import { SessionManager } from "@/lib/redis/session-manager";
 
+interface KafkaMessage {
+    id: string;
+    content: string;
+    fileUrl?: string;
+    memberId: string;
+    channelId?: string;
+    conversationId?: string;
+    serverId?: string;
+    timestamp: number;
+}
+
 export class MessageConsumer {
     private consumer: Consumer;
     private sessionManager: SessionManager;
-    private messageBuffer: any[] = [];
-    private directMessageBuffer: any[] = [];
+    private messageBuffer: KafkaMessage[] = [];
+    private directMessageBuffer: KafkaMessage[] = [];
     private readonly BATCH_SIZE = 500;
     private readonly BATCH_TIMEOUT = 5000; // 5 seconds
     private batchTimer: NodeJS.Timeout | null = null;
@@ -72,16 +83,9 @@ export class MessageConsumer {
         console.log("🛑 Message consumer stopped");
     }
 
-    private async handleMessage({
-        topic,
-        partition,
-        message,
-    }: EachMessagePayload) {
+    private async handleMessage({ topic, message }: EachMessagePayload) {
         try {
             const data = JSON.parse(message.value!.toString());
-            const retryCount = parseInt(
-                message.headers?.["retry-count"]?.toString() || "0",
-            );
 
             // Add to appropriate buffer
             if (topic === TOPICS.MESSAGES) {
@@ -131,7 +135,7 @@ export class MessageConsumer {
             if (messageBatch.length > 0) {
                 try {
                     await prisma.message.createMany({
-                        data: messageBatch.map((msg) => ({
+                        data: messageBatch.map((msg: KafkaMessage) => ({
                             id: msg.id,
                             content: msg.content,
                             memberId: msg.memberId,
@@ -145,9 +149,14 @@ export class MessageConsumer {
                     console.log(
                         `✅ Batch processed: ${messageBatch.length} channel messages`,
                     );
-                } catch (error: any) {
+                } catch (error: unknown) {
                     // Handle foreign key violations (test data, deleted members, etc.)
-                    if (error.code === "P2003") {
+                    if (
+                        error &&
+                        typeof error === "object" &&
+                        "code" in error &&
+                        error.code === "P2003"
+                    ) {
                         console.warn(
                             `⚠️ Skipping ${messageBatch.length} messages - foreign key constraint failed (invalid member/channel IDs)`,
                         );
@@ -187,8 +196,13 @@ export class MessageConsumer {
                     console.log(
                         `✅ Batch processed: ${dmBatch.length} direct messages`,
                     );
-                } catch (error: any) {
-                    if (error.code === "P2003") {
+                } catch (error: unknown) {
+                    if (
+                        error &&
+                        typeof error === "object" &&
+                        "code" in error &&
+                        error.code === "P2003"
+                    ) {
                         console.warn(
                             `⚠️ Skipping ${dmBatch.length} DMs - foreign key constraint failed`,
                         );
@@ -220,7 +234,7 @@ export class MessageConsumer {
         }
     }
 
-    private async deliverRealtime(message: any) {
+    private async deliverRealtime(message: KafkaMessage) {
         try {
             // For channel messages, get all online members of that channel
             if (message.channelId) {
@@ -255,7 +269,7 @@ export class MessageConsumer {
                                     `📨 Would deliver to user ${member.profile.userId}`,
                                 );
                             }
-                        } catch (sessionError) {
+                        } catch {
                             // Skip if Redis is unavailable
                             continue;
                         }
@@ -274,10 +288,6 @@ export class MessageConsumer {
                 });
 
                 if (conversation) {
-                    const sender =
-                        conversation.memberOne.id === message.memberId
-                            ? conversation.memberOne
-                            : conversation.memberTwo;
                     const recipient =
                         conversation.memberOne.id === message.memberId
                             ? conversation.memberTwo
@@ -305,7 +315,17 @@ export class MessageConsumer {
     /**
      * Filter out messages with invalid foreign keys
      */
-    private async filterValidMessages(messages: any[]): Promise<any[]> {
+    private async filterValidMessages(messages: KafkaMessage[]): Promise<
+        Array<{
+            id: string;
+            content: string;
+            memberId: string;
+            channelId?: string;
+            fileUrl?: string;
+            createdAt: Date;
+            updatedAt: Date;
+        }>
+    > {
         const validMessages = [];
 
         for (const msg of messages) {
@@ -344,7 +364,17 @@ export class MessageConsumer {
     /**
      * Filter out DMs with invalid foreign keys
      */
-    private async filterValidDirectMessages(messages: any[]): Promise<any[]> {
+    private async filterValidDirectMessages(messages: KafkaMessage[]): Promise<
+        Array<{
+            id: string;
+            content: string;
+            memberId: string;
+            conversationId?: string;
+            fileUrl?: string;
+            createdAt: Date;
+            updatedAt: Date;
+        }>
+    > {
         const validMessages = [];
 
         for (const msg of messages) {
@@ -390,7 +420,11 @@ export class MessageConsumer {
             let totalLag = 0;
             for (const topic of offsets) {
                 for (const partition of topic.partitions) {
-                    totalLag += parseInt(partition.lag || "0");
+                    const offset = partition.offset
+                        ? parseInt(partition.offset)
+                        : 0;
+                    const high = partition.high ? parseInt(partition.high) : 0;
+                    totalLag += high - offset;
                 }
             }
 
