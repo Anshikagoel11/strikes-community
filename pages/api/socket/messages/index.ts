@@ -2,6 +2,8 @@ import { CurrentProfilePages } from "@/lib/current-profile-pages";
 import { prisma } from "@/lib/prisma";
 import type { Server as SocketServer } from "socket.io";
 import { NextApiRequest, NextApiResponse } from "next";
+import { getProducer } from "@/lib/kafka/producer";
+import { v4 as uuidv4 } from "uuid";
 
 type NextApiResponseWithSocket = NextApiResponse & {
     socket: {
@@ -64,24 +66,56 @@ export default async function handler(
         if (!member) {
             return res.status(404).json({ message: "member not found" });
         }
-        const message = await prisma.message.create({
-            data: {
-                content,
-                fileUrl,
-                channelId: channelId as string,
-                memberId: member.id,
-            },
-            include: {
-                member: {
-                    include: {
-                        profile: true,
-                    },
+
+        // Generate message ID upfront
+        const messageId = uuidv4();
+        const timestamp = Date.now();
+
+        // Publish to Kafka (fire-and-forget for low latency)
+        // Consumer will handle database persistence in batches
+        const producer = getProducer();
+        producer.publishMessage({
+            id: messageId,
+            content,
+            fileUrl,
+            channelId: channelId as string,
+            memberId: member.id,
+            serverId: serverId as string,
+            timestamp,
+        }).catch((error) => {
+            console.error("⚠️ Kafka publish failed (non-blocking):", error);
+            // Don't fail the request - message will still be emitted via Socket.io
+        });
+
+        // Immediately emit to Socket.io for real-time delivery
+        const messageForEmit = {
+            id: messageId,
+            content,
+            fileUrl,
+            channelId: channelId as string,
+            memberId: member.id,
+            createdAt: new Date(timestamp),
+            updatedAt: new Date(timestamp),
+            deleted: false,
+            member: {
+                id: member.id,
+                role: member.role,
+                profileId: member.profileId,
+                serverId: member.serverId,
+                profile: {
+                    id: profile.id,
+                    userId: profile.userId,
+                    name: profile.name,
+                    imageUrl: profile.imageUrl,
+                    email: profile.email,
                 },
             },
-        });
+        };
+
         const channelKey = `chat:${channelId}:messages`;
-        res?.socket?.server?.io?.emit(channelKey, message);
-        return res.status(200).json(message);
+        res?.socket?.server?.io?.emit(channelKey, messageForEmit);
+
+        return res.status(200).json(messageForEmit);
     } catch (error) {
         console.log("messages_post", error);
         return res.status(500).json({ message: "internal server error" });
