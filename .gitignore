@@ -9,7 +9,7 @@
 # production
 /build
 
-# env files
+# env
 .env.production
 .env
 .env.local
