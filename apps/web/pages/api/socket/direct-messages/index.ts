@@ -119,11 +119,6 @@ export default async function handler(
                 // Don't fail the request - message will still be emitted via Socket.io
             });
 
-        // Emit to Socket.io is handled by apps/socket-server via Kafka broadcast
-        // const channelKey = `chat:${conversationId}:messages`;
-        // const sessionManager = getSessionManager();
-        // Socket emission logic removed in favor of decoupled socket server
-
         return res.status(200).json(messageForEmit);
     } catch (error) {
         console.log("direct_messages_post", error);

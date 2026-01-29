@@ -18,22 +18,13 @@ export class MessageProducer {
     private isConnected = false;
 
     constructor() {
-        this.producer = kafka.producer({
-            allowAutoTopicCreation: false,
-            transactionTimeout: 30000,
-            idempotent: true,
-            maxInFlightRequests: 5,
-            retry: {
-                retries: 5,
-            },
-        });
+        this.producer = kafka.producer();
     }
 
     async connect() {
         if (!this.isConnected) {
             await this.producer.connect();
             this.isConnected = true;
-            console.log("✅ Kafka Producer connected");
         }
     }
 
@@ -57,51 +48,13 @@ export class MessageProducer {
                     {
                         key: partitionKey,
                         value: JSON.stringify(message),
-                        headers: {
-                            "message-id": message.id,
-                            "retry-count": "0",
-                        },
                     },
                 ],
             });
 
             return message.id;
         } catch (error) {
-            console.error("❌ Failed to publish message:", error);
-            throw error;
-        }
-    }
-
-    async publishBatch(messages: ChatMessage[]): Promise<void> {
-        await this.connect();
-
-        const groupedByTopic = messages.reduce(
-            (acc, msg) => {
-                const topic = TOPICS.MESSAGES;
-                if (!acc[topic]) acc[topic] = [];
-                acc[topic].push(msg);
-                return acc;
-            },
-            {} as Record<string, ChatMessage[]>,
-        );
-
-        try {
-            for (const [topic, msgs] of Object.entries(groupedByTopic)) {
-                await this.producer.send({
-                    topic,
-                    messages: msgs.map((msg) => ({
-                        key: msg.channelId || msg.conversationId!,
-                        value: JSON.stringify(msg),
-                        headers: {
-                            "message-id": msg.id,
-                            batch: "true",
-                        },
-                    })),
-                });
-            }
-            console.log(`📦 Batch published: ${messages.length} messages`);
-        } catch (error) {
-            console.error("❌ Failed to publish batch:", error);
+            console.error("Failed to publish message:", error);
             throw error;
         }
     }

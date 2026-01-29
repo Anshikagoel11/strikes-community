@@ -110,11 +110,6 @@ export default async function handler(
                 // Don't fail the request - message will still be emitted via Socket.io
             });
 
-        // Emit will be handled by apps/socket-server consuming from Kafka
-        // const channelKey = `chat:${channelId}:messages`;
-        // const sessionManager = getSessionManager();
-        // Logic removed in favor of decoupled socket server
-
         return res.status(200).json(messageForEmit);
     } catch (error) {
         console.log("messages_post", error);

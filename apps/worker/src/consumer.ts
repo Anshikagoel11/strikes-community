@@ -21,10 +21,6 @@ export class MessageConsumer {
     constructor() {
         this.consumer = kafka.consumer({
             groupId: "message-processor",
-            sessionTimeout: 30000,
-            heartbeatInterval: 3000,
-            maxBytes: 10485760, // 10MB
-            maxWaitTimeInMs: 1000,
         });
     }
 
@@ -123,6 +119,7 @@ export class MessageConsumer {
         const dbMessages = messages
             .filter((m) => !m.conversationId)
             .map((msg) => ({
+                id: msg.id, // Use the ID from Kafka for idempotency
                 content: msg.content,
                 fileUrl: msg.fileUrl,
                 memberId: msg.memberId,
@@ -134,6 +131,7 @@ export class MessageConsumer {
         const dbDirectMessages = messages
             .filter((m) => m.conversationId)
             .map((msg) => ({
+                id: msg.id, // Use the ID from Kafka for idempotency
                 content: msg.content,
                 fileUrl: msg.fileUrl,
                 memberId: msg.memberId,

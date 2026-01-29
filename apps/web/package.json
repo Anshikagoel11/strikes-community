@@ -8,9 +8,6 @@
         "build": "next build",
         "start": "next start",
         "lint": "eslint",
-        "kafka:setup": "bun run lib/kafka/scripts/setup-kafka.ts",
-        "kafka:consumer": "bun run lib/kafka/scripts/run-consumer.ts",
-        "kafka:test": "bun run lib/kafka/scripts/test-kafka.ts",
         "prepare": "husky"
     },
     "lint-staged": {
