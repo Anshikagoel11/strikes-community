@@ -1,0 +1,87 @@
+version: "3.8"
+
+services:
+    zookeeper:
+        image: confluentinc/cp-zookeeper:latest
+        environment:
+            ZOOKEEPER_CLIENT_PORT: 2181
+            ZOOKEEPER_TICK_TIME: 2000
+        ports:
+            - "2181:2181"
+
+    kafka:
+        image: confluentinc/cp-kafka:latest
+        depends_on:
+            - zookeeper
+        ports:
+            - "9092:9092"
+        environment:
+            KAFKA_BROKER_ID: 1
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+            KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+            KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+    redis:
+        image: redis:alpine
+        ports:
+            - "6379:6379"
+        command: redis-server --appendonly yes --requirepass ""
+
+    # NOTE: Postgres is usually managed externally (e.g. Neon/Supabase) as per original env
+    # but including for local full-stack run if needed.
+    postgres:
+        image: postgres:18-alpine
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: password
+            POSTGRES_DB: strikes-community
+        ports:
+            - "5432:5432"
+
+    # -------------------------------------------------------------------------
+    # APPLICATIONS (Uncomment to run via Docker instead of Turbo Dev)
+    # -------------------------------------------------------------------------
+
+    worker:
+        build:
+            context: .
+            dockerfile: apps/worker/Dockerfile
+        restart: always
+        environment:
+            - KAFKA_BROKER=kafka:29092
+            - REDIS_URL=redis://redis:6379
+        depends_on:
+            - kafka
+            - redis
+
+    socket-server:
+        build:
+            context: .
+            dockerfile: apps/socket-server/Dockerfile
+        ports:
+            - "3001:3001"
+        environment:
+            - SOCKET_PORT=3001
+            - KAFKA_BROKER=kafka:29092
+            - REDIS_URL=redis://redis:6379
+            - NEXT_PUBLIC_SITE_URL=http://localhost:3000
+        depends_on:
+            - kafka
+            - postgres
+            - redis
+
+    web:
+        build:
+            context: .
+            dockerfile: apps/web/Dockerfile
+        ports:
+            - "3000:3000"
+        environment:
+            - NEXT_PUBLIC_SOCKET_URL=http://localhost:3001
+            - KAFKA_BROKER=kafka:29092
+        depends_on:
+            - kafka
+            - redis
+            - socket-server
