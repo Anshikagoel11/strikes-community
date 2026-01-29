@@ -4,6 +4,7 @@
   "main": "./dist/src/index.js",
   "browser": "./dist/src/browser.js",
   "types": "./dist/src/index.d.ts",
+  "type": "module",
   "sideEffects": false,
   "scripts": {
     "db:generate": "prisma generate",

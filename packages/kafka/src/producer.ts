@@ -1,4 +1,4 @@
-import { kafka, TOPICS } from "./client";
+import { kafka, TOPICS } from "./client.js";
 import type { Producer } from "kafkajs";
 
 export interface ChatMessage {

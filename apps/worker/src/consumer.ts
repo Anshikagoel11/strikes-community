@@ -184,7 +184,7 @@ export class MessageConsumer {
                         ? parseInt(partition.offset)
                         : 0;
                     const topicPartition = topicOffsets.find(
-                        (tp) => tp.partition === partition.partition,
+                        (tp: any) => tp.partition === partition.partition,
                     );
                     const highWatermark = topicPartition?.high
                         ? parseInt(topicPartition.high)

@@ -98,7 +98,7 @@ async function startConsumer() {
     await consumer.subscribe({ topics: [TOPICS.MESSAGES] });
 
     await consumer.run({
-        eachMessage: async ({ topic, message }) => {
+        eachMessage: async ({ topic, message }: any) => {
             try {
                 const data = JSON.parse(message.value!.toString());
                 const channelKey =

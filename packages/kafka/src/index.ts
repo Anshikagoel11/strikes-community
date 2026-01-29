@@ -1,3 +1,3 @@
-export * from "./client";
-export * from "./producer";
+export * from "./client.js";
+export * from "./producer.js";
 export * from "kafkajs";

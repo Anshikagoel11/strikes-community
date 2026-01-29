@@ -7,11 +7,12 @@
         "strict": true,
         "forceConsistentCasingInFileNames": true,
         "esModuleInterop": true,
-        "module": "commonjs",
-        "moduleResolution": "node",
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
         "resolveJsonModule": true,
         "isolatedModules": true,
         "declaration": true,
+        "rootDir": "src",
         "outDir": "dist"
     },
     "include": ["src"]

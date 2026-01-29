@@ -4,7 +4,8 @@
         "target": "es2017",
         "lib": ["esnext"],
         "allowJs": true,
-        "module": "commonjs",
+        "module": "NodeNext",
+        "moduleResolution": "nodeNext",
         "resolveJsonModule": true,
         "outDir": "dist",
         "rootDir": "src"

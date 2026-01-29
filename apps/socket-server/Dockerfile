@@ -14,7 +14,9 @@ COPY --from=builder /app/package.json .
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/apps/socket-server/dist ./apps/socket-server/dist
 COPY --from=builder /app/apps/socket-server/package.json ./apps/socket-server/package.json
+# Copy workspace packages that socket-server depends on
+COPY --from=builder /app/packages ./packages
 
 WORKDIR /app/apps/socket-server
 EXPOSE 3001
-CMD ["node", "dist/index.js"]
+CMD ["bun", "run", "dist/index.js"]

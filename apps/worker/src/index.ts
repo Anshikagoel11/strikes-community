@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { getConsumer } from "./consumer";
+import { getConsumer } from "./consumer.js";
 
 async function runConsumer() {
     console.log("Starting Kafka Consumer...\n");

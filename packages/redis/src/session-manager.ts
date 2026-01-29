@@ -1,4 +1,4 @@
-import Redis from "ioredis";
+import { Redis } from "ioredis";
 
 export interface UserSession {
     userId: string;
@@ -22,7 +22,7 @@ export class SessionManager {
         this.redis = new Redis(
             process.env.REDIS_URL || "redis://localhost:6379",
             {
-                retryStrategy: (times) => {
+                retryStrategy: (times: number) => {
                     if (times > 3) {
                         console.warn(
                             "⚠️ Redis not available - session features disabled",
@@ -42,7 +42,7 @@ export class SessionManager {
             console.log("✅ Redis connected");
         });
 
-        this.redis.on("error", (error) => {});
+        this.redis.on("error", (error: any) => {});
     }
 
     async setUserSession(userId: string, session: UserSession): Promise<void> {
