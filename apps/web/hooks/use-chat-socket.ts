@@ -19,14 +19,25 @@ export const useChatSocket = ({
     addKey,
     updateKey,
     queryKey,
-}: ChatSocketProvider) => {
+    chatId,
+    type,
+}: ChatSocketProvider & {
+    chatId: string;
+    type: "channel" | "conversation";
+}) => {
     const { socket } = useSocket();
     const queryClient = useQueryClient();
 
     useEffect(() => {
-        if (!socket) {
+        if (!socket || !chatId) {
             return;
         }
+
+        // Join room based on type
+        const event = type === "channel" ? "join-channel" : "join-conversation";
+        socket.emit(event, chatId);
+        console.log(`🏠 Joined room: ${type}:${chatId}`);
+
         socket.on(updateKey, (message: MessageWithMemberWithProfile) => {
             queryClient.setQueryData(
                 [queryKey],
@@ -102,8 +113,11 @@ export const useChatSocket = ({
         });
 
         return () => {
+            const leaveEvent =
+                type === "channel" ? "leave-channel" : "leave-conversation";
+            socket.emit(leaveEvent, chatId);
             socket.off(addKey);
             socket.off(updateKey);
         };
-    }, [queryClient, addKey, queryKey, socket, updateKey]);
+    }, [queryClient, addKey, queryKey, socket, updateKey, chatId, type]);
 };

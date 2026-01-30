@@ -1,4 +1,4 @@
-import { kafka, TOPICS } from "@repo/kafka";
+import { kafka, TOPICS, getProducer } from "@repo/kafka";
 import { prisma } from "@repo/db";
 import type { Consumer, EachBatchPayload } from "@repo/kafka";
 
@@ -119,25 +119,23 @@ export class MessageConsumer {
         const dbMessages = messages
             .filter((m) => !m.conversationId)
             .map((msg) => ({
-                id: msg.id, // Use the ID from Kafka for idempotency
+                id: msg.id,
                 content: msg.content,
                 fileUrl: msg.fileUrl,
                 memberId: msg.memberId,
                 channelId: msg.channelId!,
                 deleted: false,
-                // createdAt: new Date(msg.timestamp),
             }));
 
         const dbDirectMessages = messages
             .filter((m) => m.conversationId)
             .map((msg) => ({
-                id: msg.id, // Use the ID from Kafka for idempotency
+                id: msg.id,
                 content: msg.content,
                 fileUrl: msg.fileUrl,
                 memberId: msg.memberId,
                 conversationId: msg.conversationId,
                 deleted: false,
-                // createdAt: new Date(msg.timestamp),
             }));
 
         try {
@@ -157,8 +155,26 @@ export class MessageConsumer {
                 `✅ Saved ${dbMessages.length + dbDirectMessages.length} messages`,
             );
         } catch (e) {
-            console.error("❌ DB Batch Write Failed", e);
-            throw e; // Retry batch
+            console.error(
+                "❌ DB Batch Write Failed. Attempting to re-queue messages...",
+                e,
+            );
+
+            // Re-push back to Kafka for retry
+            const producer = getProducer();
+            try {
+                for (const msg of messages) {
+                    await producer.publishMessage(msg);
+                }
+                console.log(
+                    `🔄 Re-queued ${messages.length} messages to tail of topic ${TOPICS.MESSAGES}`,
+                );
+            } catch (produceError) {
+                console.error(
+                    "🔥 CRITICAL: Failed to re-queue messages to Kafka!",
+                    produceError,
+                );
+            }
         }
     }
 
