@@ -1,14 +1,14 @@
 {
-  "extends": "@repo/typescript-config/base.json",
-  "compilerOptions": {
-    "target": "es2017",
-    "lib": ["esnext"],
-    "allowJs": true,
-    "module": "ES2022",
-    "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "outDir": "dist",
-    "rootDir": "src"
-  },
-  "include": ["src"]
+    "extends": "@repo/typescript-config/base.json",
+    "compilerOptions": {
+        "target": "es2017",
+        "lib": ["esnext"],
+        "allowJs": true,
+        "module": "ES2022",
+        "moduleResolution": "bundler",
+        "resolveJsonModule": true,
+        "outDir": "dist",
+        "rootDir": "src"
+    },
+    "include": ["src"]
 }

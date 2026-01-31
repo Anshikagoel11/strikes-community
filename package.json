@@ -1,39 +1,39 @@
 {
-  "name": "strikes-community",
-  "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
-  "scripts": {
-    "build": "turbo build",
-    "dev": "turbo dev",
-    "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md,js,json}\"",
-    "clean": "find . -name \"node_modules\" -o -name \".turbo\" -o -name \"dist\" -o -name \".next\" | xargs rm -rf",
-    "db:generate": "turbo db:generate",
-    "db:migrate": "turbo db:migrate",
-    "db:migrate_dev": "turbo db:migrate_dev",
-    "db:studio": "turbo db:studio",
-    "db:push": "turbo db:push",
-    "prepare": "husky"
-  },
-  "devDependencies": {
-    "eslint": "^9.0.0",
-    "husky": "^9.1.7",
-    "lint-staged": "^15.2.10",
-    "prettier": "^3.0.0",
-    "turbo": "latest",
-    "@repo/eslint-config": "workspace:*"
-  },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
+    "name": "strikes-community",
+    "private": true,
+    "workspaces": [
+        "apps/*",
+        "packages/*"
     ],
-    "*.{json,md,css}": [
-      "prettier --write"
-    ]
-  },
-  "packageManager": "bun@1.0.0"
+    "scripts": {
+        "build": "turbo build",
+        "dev": "turbo dev",
+        "lint": "turbo lint",
+        "format": "prettier --write \"**/*.{ts,tsx,md,js,json}\"",
+        "clean": "find . -name \"node_modules\" -o -name \".turbo\" -o -name \"dist\" -o -name \".next\" | xargs rm -rf",
+        "db:generate": "turbo db:generate",
+        "db:migrate": "turbo db:migrate",
+        "db:migrate_dev": "turbo db:migrate_dev",
+        "db:studio": "turbo db:studio",
+        "db:push": "turbo db:push",
+        "prepare": "husky"
+    },
+    "devDependencies": {
+        "eslint": "^9.0.0",
+        "husky": "^9.1.7",
+        "lint-staged": "^15.2.10",
+        "prettier": "^3.0.0",
+        "turbo": "latest",
+        "@repo/eslint-config": "workspace:*"
+    },
+    "lint-staged": {
+        "*.{js,jsx,ts,tsx}": [
+            "eslint --fix",
+            "prettier --write"
+        ],
+        "*.{json,md,css}": [
+            "prettier --write"
+        ]
+    },
+    "packageManager": "bun@1.0.0"
 }

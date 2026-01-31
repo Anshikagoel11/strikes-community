@@ -4,6 +4,11 @@ import { config as sharedConfig } from "@repo/eslint-config/flat.js";
 export default [
     ...sharedConfig,
     {
-        ignores: [".next/**", "dist/**", "node_modules/**", ".turbo/**"],
+        ignores: [
+            "**/.next/**",
+            "**/dist/**",
+            "**/node_modules/**",
+            "**/.turbo/**",
+        ],
     },
 ];

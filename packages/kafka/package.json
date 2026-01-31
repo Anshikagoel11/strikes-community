@@ -1,19 +1,19 @@
 {
-  "name": "@repo/kafka",
-  "version": "0.1.0",
-  "type": "module",
-  "exports": {
-    ".": "./src/index.ts"
-  },
-  "scripts": {
-    "dev": "tsc --watch",
-    "build": "tsc"
-  },
-  "dependencies": {
-    "kafkajs": "^2.2.4"
-  },
-  "devDependencies": {
-    "typescript": "^5",
-    "@types/node": "^22.0.0"
-  }
+    "name": "@repo/kafka",
+    "version": "0.1.0",
+    "type": "module",
+    "exports": {
+        ".": "./src/index.ts"
+    },
+    "scripts": {
+        "dev": "tsc --watch",
+        "build": "tsc"
+    },
+    "dependencies": {
+        "kafkajs": "^2.2.4"
+    },
+    "devDependencies": {
+        "typescript": "^5",
+        "@types/node": "^22.0.0"
+    }
 }
