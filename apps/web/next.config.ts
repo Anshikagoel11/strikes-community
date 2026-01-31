@@ -4,7 +4,8 @@ const nextConfig: NextConfig = {
     /* config options here */
     output: "standalone",
     reactCompiler: true,
-    transpilePackages: ["@repo/db", "@repo/kafka"],
+    transpilePackages: ["@repo/db", "@repo/kafka", "@repo/redis"],
+
     images: {
         remotePatterns: [
             { hostname: "uploadthing.com" },

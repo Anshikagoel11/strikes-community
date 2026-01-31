@@ -5,7 +5,9 @@
   "license": "MIT",
   "main": "./flat.js",
   "exports": {
-    ".": "./flat.js"
+    ".": "./flat.js",
+    "./flat.js": "./flat.js",
+    "./library.js": "./library.js"
   },
   "publishConfig": {
     "access": "public",

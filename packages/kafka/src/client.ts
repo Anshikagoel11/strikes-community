@@ -1,5 +1,4 @@
 import { Kafka, logLevel } from "kafkajs";
-import "dotenv/config";
 
 export const kafka = new Kafka({
     clientId: "strikes-community",

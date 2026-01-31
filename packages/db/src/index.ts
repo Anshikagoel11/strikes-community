@@ -1,3 +1,3 @@
-export { MemberRole, ChannelType } from "../generated/prisma/enums.js";
-export { prisma } from "./prisma.js";
-export type * from "../generated/prisma/client.js";
+export { MemberRole, ChannelType } from "@prisma/client";
+export { prisma } from "./prisma";
+export type * from "@prisma/client";
