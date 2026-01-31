@@ -3,13 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "license": "MIT",
-  "files": [
-    "base.json"
-  ],
   "exports": {
+    "./base": "./base.json",
     "./base.json": "./base.json"
-  },
-  "publishConfig": {
-    "access": "public"
   }
 }

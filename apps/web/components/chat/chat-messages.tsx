@@ -1,10 +1,6 @@
 "use client";
 
-import {
-    type Member,
-    type Message,
-    type Profile,
-} from "@repo/db";
+import { type Member, type Message, type Profile } from "@repo/db";
 import ChatWelcome from "./chat-welcome";
 import { useChatQuery } from "@/hooks/use-chat-query";
 import { Loader2, ServerCrash, ChevronUp } from "lucide-react";

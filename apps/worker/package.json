@@ -4,7 +4,7 @@
   "main": "./src/index.ts",
   "type": "module",
   "scripts": {
-    "dev": "bun --watch src/index.ts",
+    "dev": "bun --env-file=../../.env --watch src/index.ts",
     "build": "tsc",
     "start": "bun src/index.ts"
   },

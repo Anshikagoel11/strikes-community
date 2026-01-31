@@ -7,7 +7,7 @@ import { Separator } from "../ui/separator";
 import { ScrollArea } from "../ui/scroll-area";
 import NavigationItems from "./navigation-items";
 import { ModeToggle } from "../ModeToggle";
-import { UserButton } from "@clerk/nextjs";
+import { ClerkUserButton } from "../clerk-user-button";
 import { HomeIcon } from "lucide-react";
 import { Button } from "../ui/button";
 
@@ -69,7 +69,7 @@ const NavigationSidebar = async () => {
                     </Button>
 
                     <div className="w-full flex justify-center">
-                        <UserButton />
+                        <ClerkUserButton />
                     </div>
                 </div>
             </div>

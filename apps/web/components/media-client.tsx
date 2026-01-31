@@ -15,16 +15,21 @@ interface MediaRoomProps {
 export const MediaRoom = ({ chatId, video, audio }: MediaRoomProps) => {
     const { user } = useUser();
     const [token, setToken] = useState("");
+    const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
-        if (!user?.firstName || !user?.lastName) return;
+        setIsMounted(true);
+    }, []);
 
-        const name = user?.firstName + " " + user?.lastName;
+    useEffect(() => {
+        if (!user?.id || !user?.firstName || !user?.lastName) return;
+
+        const name = `${user.firstName} ${user.lastName}`;
 
         const wrapper = async () => {
             try {
                 const resp = await fetch(
-                    `/api/livekit?room=${chatId}&username=${name}`,
+                    `/api/livekit?room=${chatId}&identity=${user.id}&name=${encodeURIComponent(name)}`,
                 );
                 const data = await resp.json();
                 setToken(data.token);
@@ -33,9 +38,9 @@ export const MediaRoom = ({ chatId, video, audio }: MediaRoomProps) => {
             }
         };
         wrapper();
-    }, [user?.firstName, user?.lastName, chatId]);
+    }, [user?.id, user?.firstName, user?.lastName, chatId]);
 
-    if (token === "") {
+    if (!isMounted || token === "") {
         return (
             <div className="flex items-center justify-center flex-1 flex-col">
                 <Loader2 className="h-7 w-7 animate-spin my-4" />

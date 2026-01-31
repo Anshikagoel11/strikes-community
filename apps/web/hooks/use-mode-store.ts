@@ -1,8 +1,4 @@
-import type {
-    Channel,
-    ChannelType,
-    Server,
-} from "@repo/db";
+import type { Channel, ChannelType, Server } from "@repo/db";
 import { create } from "zustand";
 
 export type ModalType =

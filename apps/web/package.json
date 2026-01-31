@@ -4,20 +4,10 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "dev": "next dev",
+        "dev": "bun --env-file=../../.env next dev",
         "build": "next build",
         "start": "next start",
-        "lint": "eslint",
-        "prepare": "husky"
-    },
-    "lint-staged": {
-        "*.{js,jsx,ts,tsx}": [
-            "eslint --fix",
-            "prettier --write"
-        ],
-        "*.{json,md,css}": [
-            "prettier --write"
-        ]
+        "lint": "eslint"
     },
     "dependencies": {
         "@clerk/nextjs": "^6.36.5",
