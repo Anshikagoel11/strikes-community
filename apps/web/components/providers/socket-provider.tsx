@@ -17,10 +17,15 @@ export const useSocket = () => {
     return useContext(socketContext);
 };
 
+import { useParams } from "next/navigation";
+
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     const [socket, setSocket] = useState<Socket | null>(null);
     const [isConnected, setIsConnected] = useState(false);
     const { userId } = useAuth();
+    const params = useParams();
+
+    const serverId = params?.serverId as string | undefined;
 
     useEffect(() => {
         const socketInstance = io(
@@ -33,31 +38,27 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
             },
         );
 
-        const handleConnect = () => {
+        socketInstance.on("connect", () => {
             setIsConnected(true);
             setSocket(socketInstance);
+        });
 
-            // Identify user to server for session tracking
-            if (userId) {
-                socketInstance.emit("identify", { userId });
-                console.log(`📡 User identified: ${userId}`);
-            }
-        };
-
-        const handleDisconnect = () => {
+        socketInstance.on("disconnect", () => {
             setIsConnected(false);
             setSocket(null);
-        };
-
-        socketInstance.on("connect", handleConnect);
-        socketInstance.on("disconnect", handleDisconnect);
+        });
 
         return () => {
-            socketInstance.off("connect", handleConnect);
-            socketInstance.off("disconnect", handleDisconnect);
             socketInstance.disconnect();
         };
-    }, [userId]);
+    }, []);
+
+    useEffect(() => {
+        if (socket && userId) {
+            socket.emit("identify", { userId, serverId });
+            console.log(`📡 User identified: ${userId}, serverId: ${serverId}`);
+        }
+    }, [socket, userId, serverId]);
 
     return (
         <socketContext.Provider value={{ socket, isConnected }}>

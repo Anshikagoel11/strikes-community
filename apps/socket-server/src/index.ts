@@ -42,17 +42,25 @@ const io = new ServerIO(httpServer, {
 
 const sessionManager = getSessionManager();
 
+// Unique ID for this server instance
+const NODE_ID = crypto.randomUUID();
+console.log(`Server Node ID: ${NODE_ID}`);
+
 io.on("connection", (socket) => {
-    console.log(`New connection: ${socket.id}`);
+    console.log(`New connection: ${socket.id} on node ${NODE_ID}`);
 
     // Listen for user identification
     socket.on(
         "identify",
         async (data: { userId: string; serverId?: string }) => {
+            console.log(
+                `User identified: ${data.userId} → ${socket.id} on node ${NODE_ID} (Context: ${data.serverId})`,
+            );
             try {
                 await sessionManager.setUserSession(data.userId, {
                     userId: data.userId,
                     serverId: data.serverId,
+                    nodeId: NODE_ID,
                     socketId: socket.id,
                     connectedAt: Date.now(),
                     lastSeen: Date.now(),

@@ -3,6 +3,7 @@ import { Redis } from "ioredis";
 export interface UserSession {
     userId: string;
     serverId?: string;
+    nodeId: string;
     socketId: string;
     connectedAt: number;
     lastSeen: number;

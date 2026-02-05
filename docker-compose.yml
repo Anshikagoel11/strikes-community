@@ -27,8 +27,6 @@ services:
             - "6379:6379"
         command: redis-server --appendonly yes --requirepass ""
 
-    # NOTE: Postgres is usually managed externally (e.g. Neon/Supabase) as per original env
-    # but including for local full-stack run if needed.
     postgres:
         image: postgres:17-alpine
         environment:
