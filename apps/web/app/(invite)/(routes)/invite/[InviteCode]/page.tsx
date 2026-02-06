@@ -1,5 +1,5 @@
 import { CurrentProfile } from "@/lib/current-profile";
-import { prisma } from "@repo/db";
+import { prisma, MemberRole } from "@repo/db";
 import { redirect } from "next/navigation";
 
 const InviteCodePage = async ({
@@ -17,6 +17,7 @@ const InviteCodePage = async ({
         return redirect("/sign-in");
     }
 
+    // Check if user is already a member of this server
     const existingServer = await prisma.server.findFirst({
         where: {
             inviteCode: InviteCode,
@@ -31,21 +32,36 @@ const InviteCodePage = async ({
         return redirect(`/servers/${existingServer.id}`);
     }
 
-    // join the server
+    // Verify the invite code exists before trying to join
+    const serverToJoin = await prisma.server.findUnique({
+        where: {
+            inviteCode: InviteCode,
+        },
+    });
+
+    if (!serverToJoin) {
+        // Invalid invite code - redirect to home
+        return redirect("/");
+    }
+
+    // Join the server by adding the user as a member
     const server = await prisma.server.update({
         where: {
             inviteCode: InviteCode,
         },
         data: {
             members: {
-                create: [{ profileId: profile.id }],
+                create: [
+                    {
+                        profileId: profile.id,
+                        role: MemberRole.GUEST,
+                    },
+                ],
             },
         },
     });
 
-    if (server) {
-        return redirect(`/servers/${server.id}`);
-    }
+    return redirect(`/servers/${server.id}`);
 };
 
 export default InviteCodePage;

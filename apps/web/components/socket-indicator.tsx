@@ -20,7 +20,7 @@ export const SocketIndicator = () => {
             variant={"outline"}
             className="bg-primary-color text-white border-none"
         >
-            Live: Real time updates
+            Live
         </Badge>
     );
 };
