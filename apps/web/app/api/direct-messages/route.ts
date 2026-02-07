@@ -3,7 +3,10 @@ import { NextResponse } from "next/server";
 import { DirectMessage } from "@repo/db";
 import { prisma } from "@repo/db";
 
+import { getMessageCache } from "@repo/redis";
+
 const MESSAGE_BATCH = 10;
+const messageCache = getMessageCache();
 
 export async function GET(req: Request) {
     try {
@@ -22,6 +25,22 @@ export async function GET(req: Request) {
             });
         }
         let messages: DirectMessage[] = [];
+
+        // Cache key format: chat:conversationId:messages:cursor
+        const cacheKey = `chat:${conversationId}:messages:${cursor || "initial"}`;
+
+        // Try to get from cache first
+        const cachedMessages = await messageCache.getMessages(cacheKey);
+        if (cachedMessages) {
+            console.log(`[API] Cache hit for ${cacheKey}`);
+            return NextResponse.json({
+                items: cachedMessages,
+                nextCursor:
+                    cachedMessages.length === MESSAGE_BATCH
+                        ? cachedMessages[MESSAGE_BATCH - 1].id
+                        : null,
+            });
+        }
 
         if (cursor) {
             messages = await prisma.directMessage.findMany({
@@ -66,6 +85,10 @@ export async function GET(req: Request) {
         if (messages.length === MESSAGE_BATCH) {
             nextCursor = messages[MESSAGE_BATCH - 1].id;
         }
+
+        // Store in cache
+        await messageCache.addMessages(cacheKey, messages);
+
         return NextResponse.json({
             items: messages,
             nextCursor,

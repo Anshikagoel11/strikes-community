@@ -5,7 +5,11 @@ import { Loader2, Mic, Video } from "lucide-react";
 import { useEffect, useState } from "react";
 import { LiveKitRoom, VideoConference } from "@livekit/components-react";
 import "@livekit/components-styles";
+import { useCall } from "@/hooks/use-call";
 import { Button } from "@/components/ui/button";
+import { useRouter, usePathname } from "next/navigation";
+import qs from "query-string";
+import { useTheme } from "next-themes";
 
 interface MediaRoomProps {
     chatId: string;
@@ -24,6 +28,9 @@ export const MediaRoom = ({
     const [token, setToken] = useState("");
     const [isMounted, setIsMounted] = useState(false);
     const [joined, setJoined] = useState(autoJoin);
+    const router = useRouter();
+    const pathname = usePathname();
+    const { resolvedTheme } = useTheme();
 
     useEffect(() => {
         setIsMounted(true);
@@ -93,15 +100,30 @@ export const MediaRoom = ({
 
     return (
         <LiveKitRoom
-            data-lk-theme="default"
+            data-lk-theme={resolvedTheme === "dark" ? "dark" : "default"}
             serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL}
             token={token}
             connect={true}
             video={video}
             audio={audio}
+            onError={(e) => {
+                console.error("LiveKit Room Error:", e);
+            }}
             onDisconnected={() => {
+                console.log("LiveKit Room Disconnected");
                 setJoined(false);
                 setToken("");
+                // endCall(); // Temporarily disabled to debug connection drop
+                const url = qs.stringifyUrl(
+                    {
+                        url: pathname || "",
+                        query: {
+                            video: undefined,
+                        },
+                    },
+                    { skipNull: true },
+                );
+                router.push(url);
             }}
         >
             <VideoConference />

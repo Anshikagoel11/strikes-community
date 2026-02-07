@@ -12,15 +12,18 @@ export interface UserSession {
 export interface CallData {
     callId: string;
     callerId: string;
+    callerMemberId: string;
     callerName: string;
     callerImage: string;
     recipientId: string;
+    recipientMemberId: string;
     recipientName: string;
     recipientImage: string;
     conversationId: string;
     roomName: string;
     initiatedAt: number;
-    status: "ringing" | "active" | "ended";
+    serverId?: string;
+    status: "ringing" | "active" | "ended" | "rejected";
 }
 
 export class SessionManager {

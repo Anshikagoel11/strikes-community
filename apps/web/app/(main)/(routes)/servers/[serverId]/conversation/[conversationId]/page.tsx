@@ -38,6 +38,10 @@ const ConversationPage = async (props: ConversationPageProps) => {
         conversationId,
     );
     if (!conversation) {
+        console.error(
+            "ConversationPage: Conversation not found or could not be created",
+            { currentMemberId: currentMember.id, conversationId },
+        );
         return redirect(`/servers/${serverId}`);
     }
     const { memberOne, memberTwo } = conversation;
@@ -51,7 +55,9 @@ const ConversationPage = async (props: ConversationPageProps) => {
                 name={otherMember.profile.name}
                 serverId={serverId}
                 type="conversation"
-                recipientMemberId={otherMember.profile.userId}
+                currentMemberId={currentMember.id}
+                recipientUserId={otherMember.profile.userId}
+                recipientMemberId={otherMember.id}
                 conversationId={conversation.id}
             />
 

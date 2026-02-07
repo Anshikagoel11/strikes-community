@@ -27,6 +27,12 @@ services:
             - "6379:6379"
         command: redis-server --appendonly yes --requirepass ""
 
+    redis-cache:
+        image: redis:alpine
+        ports:
+            - "6380:6379"
+        command: redis-server --appendonly yes --requirepass ""
+
     postgres:
         image: postgres:17-alpine
         environment:

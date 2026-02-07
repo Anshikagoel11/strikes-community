@@ -26,6 +26,7 @@ const FileUpload = ({ onChange, value, endpoint }: fileUploadProp) => {
                             fill
                             src={value}
                             alt="Upload"
+                            unoptimized
                             className="rounded-full object-cover ring-4 ring-primary/10"
                             onError={() => setImgError(true)}
                             onLoadingComplete={() => setImgError(false)}

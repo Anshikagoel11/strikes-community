@@ -33,7 +33,6 @@ export async function GET(req: NextRequest) {
             { status: 500 },
         );
     }
-
     try {
         const at = new AccessToken(apiKey, apiSecret, {
             identity: identity,

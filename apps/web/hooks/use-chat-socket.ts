@@ -36,7 +36,6 @@ export const useChatSocket = ({
         // Join room based on type
         const event = type === "channel" ? "join-channel" : "join-conversation";
         socket.emit(event, chatId);
-        console.log(`🏠 Joined room: ${type}:${chatId}`);
 
         socket.on(updateKey, (message: MessageWithMemberWithProfile) => {
             queryClient.setQueryData(

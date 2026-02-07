@@ -8,17 +8,23 @@ import qs from "query-string";
 import ActionTooltip from "../action-tooltip";
 
 interface ChatVideoButtonProps {
+    currentMemberId?: string;
+    recipientUserId?: string;
     recipientMemberId?: string;
     recipientName?: string;
     recipientImageUrl?: string;
     conversationId?: string;
+    serverId?: string;
 }
 
 export const ChatVideoButton = ({
+    currentMemberId,
+    recipientUserId,
     recipientMemberId,
     recipientName,
     recipientImageUrl,
     conversationId,
+    serverId,
 }: ChatVideoButtonProps) => {
     const { user } = useUser();
     const pathname = usePathname();
@@ -48,6 +54,8 @@ export const ChatVideoButton = ({
             // Initiate call via socket
             if (
                 userId &&
+                currentMemberId &&
+                recipientUserId &&
                 recipientMemberId &&
                 recipientName &&
                 conversationId &&
@@ -55,12 +63,15 @@ export const ChatVideoButton = ({
             ) {
                 initiateCall(
                     userId,
+                    currentMemberId,
                     user.firstName || user.username || "Unknown",
                     user.imageUrl,
+                    recipientUserId,
                     recipientMemberId,
                     recipientName,
                     recipientImageUrl || "",
                     conversationId,
+                    serverId,
                     "video",
                 );
             }

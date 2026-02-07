@@ -155,6 +155,7 @@ const ChatItem = ({
                                 src={fileUrl}
                                 alt={content}
                                 fill
+                                unoptimized
                                 className="object-cover"
                                 onError={() => setHasError(true)}
                             />

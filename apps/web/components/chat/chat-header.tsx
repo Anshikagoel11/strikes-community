@@ -9,6 +9,8 @@ interface ChatHeaderProps {
     name: string;
     type: "channel" | "conversation";
     imageUrl?: string;
+    currentMemberId?: string;
+    recipientUserId?: string;
     recipientMemberId?: string;
     conversationId?: string;
 }
@@ -18,6 +20,8 @@ const ChatHeader = ({
     name,
     type,
     imageUrl,
+    currentMemberId,
+    recipientUserId,
     recipientMemberId,
     conversationId,
 }: ChatHeaderProps) => {
@@ -38,10 +42,13 @@ const ChatHeader = ({
             <div className="ml-auto flex items-center">
                 {type === "conversation" && (
                     <ChatVideoButton
+                        currentMemberId={currentMemberId}
+                        recipientUserId={recipientUserId}
                         recipientMemberId={recipientMemberId}
                         recipientName={name}
                         recipientImageUrl={imageUrl}
                         conversationId={conversationId}
+                        serverId={serverId}
                     />
                 )}
                 <SocketIndicator />

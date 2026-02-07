@@ -7,8 +7,9 @@ import {
     useEffect,
     useState,
 } from "react";
+import { useAuth } from "@clerk/nextjs";
 import { useSocket } from "@/components/providers/socket-provider";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
 export interface CallState {
@@ -16,12 +17,15 @@ export interface CallState {
     isIncoming: boolean;
     isOutgoing: boolean;
     callerId?: string;
+    callerMemberId?: string;
     callerName?: string;
     callerImage?: string;
     recipientId?: string;
+    recipientMemberId?: string;
     recipientName?: string;
     recipientImage?: string;
     conversationId?: string;
+    serverId?: string;
     callType?: "video" | "audio";
     initiatedAt?: number;
 }
@@ -30,12 +34,15 @@ export interface CallContextType {
     callState: CallState;
     initiateCall: (
         callerId: string,
+        callerMemberId: string,
         callerName: string,
         callerImage: string,
         recipientId: string,
+        recipientMemberId: string,
         recipientName: string,
         recipientImage: string,
         conversationId: string,
+        serverId?: string,
         callType?: "video" | "audio",
     ) => void;
     acceptCall: (callId: string) => void;
@@ -49,8 +56,10 @@ const CallContext = createContext<CallContextType | undefined>(undefined);
 
 export const CallProvider = ({ children }: { children: React.ReactNode }) => {
     const { socket } = useSocket();
+    const { userId } = useAuth();
     const router = useRouter();
     const pathname = usePathname();
+    const searchParams = useSearchParams();
     const [callState, setCallState] = useState<CallState>({
         callId: null,
         isIncoming: false,
@@ -62,12 +71,15 @@ export const CallProvider = ({ children }: { children: React.ReactNode }) => {
     const initiateCall = useCallback(
         (
             callerId: string,
+            callerMemberId: string,
             callerName: string,
             callerImage: string,
             recipientId: string,
+            recipientMemberId: string,
             recipientName: string,
             recipientImage: string,
             conversationId: string,
+            serverId?: string,
             callType: "video" | "audio" = "video",
         ) => {
             if (!socket) return;
@@ -77,20 +89,25 @@ export const CallProvider = ({ children }: { children: React.ReactNode }) => {
                 isOutgoing: true,
                 isIncoming: false,
                 recipientId,
+                recipientMemberId,
                 recipientName,
                 recipientImage,
                 conversationId,
+                serverId,
                 callType,
             });
 
             socket.emit("call:initiate", {
                 callerId,
+                callerMemberId,
                 callerName,
                 callerImage,
                 recipientId,
+                recipientMemberId,
                 recipientName,
                 recipientImage,
                 conversationId,
+                serverId,
                 callType,
             });
         },
@@ -167,6 +184,7 @@ export const CallProvider = ({ children }: { children: React.ReactNode }) => {
             (data: {
                 callId: string;
                 callerId: string;
+                callerMemberId: string;
                 callerName: string;
                 callerImage: string;
                 conversationId: string;
@@ -178,6 +196,7 @@ export const CallProvider = ({ children }: { children: React.ReactNode }) => {
                     isIncoming: true,
                     isOutgoing: false,
                     callerId: data.callerId,
+                    callerMemberId: data.callerMemberId,
                     callerName: data.callerName,
                     callerImage: data.callerImage,
                     conversationId: data.conversationId,
@@ -193,29 +212,57 @@ export const CallProvider = ({ children }: { children: React.ReactNode }) => {
             (data: {
                 callId: string;
                 recipientId: string;
+                recipientMemberId: string;
                 recipientName: string;
                 initiatedAt: number;
             }) => {
                 setCallState((prev) => ({
                     ...prev,
                     callId: data.callId,
+                    recipientMemberId: data.recipientMemberId,
                     initiatedAt: data.initiatedAt,
                 }));
             },
         );
 
         // Call accepted
-        socket.on("call:accepted", () => {
-            // Clear state BEFORE navigation to prevent "already in call" error
-            setCallState({
-                callId: null,
-                isIncoming: false,
-                isOutgoing: false,
-            });
+        socket.on(
+            "call:accepted",
+            (data: {
+                callId: string;
+                roomName: string;
+                conversationId: string;
+                serverId?: string;
+                callerId: string;
+                callerMemberId: string;
+                recipientId: string;
+                recipientMemberId: string;
+            }) => {
+                setCallState((prev) => ({
+                    ...prev,
+                    callId: data.callId,
+                    isIncoming: false,
+                    isOutgoing: false,
+                    conversationId: data.conversationId,
+                }));
 
-            // Navigate to video call
-            router.push(`${pathname || ""}?video=true`);
-        });
+                const otherMemberIdForRoute =
+                    data.callerId === userId
+                        ? data.recipientMemberId
+                        : data.callerMemberId;
+
+                const targetPath = data.serverId
+                    ? `/servers/${data.serverId}/conversation/${otherMemberIdForRoute}?video=true`
+                    : `${pathname}?video=true`;
+
+                const isVideo = searchParams?.get("video");
+                const targetBase = targetPath.split("?")[0];
+
+                if (pathname !== targetBase || !isVideo) {
+                    router.push(targetPath);
+                }
+            },
+        );
 
         // Call rejected
         socket.on(
@@ -233,14 +280,16 @@ export const CallProvider = ({ children }: { children: React.ReactNode }) => {
 
         // Call ended
         socket.on("call:ended", () => {
-            console.log("[Socket] Call ended event received");
             toast.info("Call ended");
             clearCallState();
 
-            // If we are currently in video mode, navigate back to chat
-            const searchParams = new URLSearchParams(window.location.search);
-            if (searchParams.get("video") === "true") {
-                router.push((pathname as string) || "/");
+            // Check if we are on client side
+            if (typeof window !== "undefined") {
+                const newUrl = new URL(window.location.href);
+                if (newUrl.searchParams.get("video") === "true") {
+                    newUrl.searchParams.delete("video");
+                    router.push(newUrl.pathname + newUrl.search);
+                }
             }
         });
 
@@ -274,7 +323,7 @@ export const CallProvider = ({ children }: { children: React.ReactNode }) => {
             socket.off("call:user-busy");
             socket.off("call:error");
         };
-    }, [socket, router, pathname, clearCallState]);
+    }, [socket, router, pathname, clearCallState, userId]);
 
     return (
         <CallContext.Provider

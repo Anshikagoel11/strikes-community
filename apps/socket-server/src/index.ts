@@ -3,6 +3,7 @@ import { Server as ServerIO } from "socket.io";
 import { createAdapter } from "@socket.io/redis-adapter";
 import { Redis } from "ioredis";
 import { getSessionManager } from "@repo/redis";
+import type { CallData } from "@repo/redis";
 
 // Kafka Consumer for Broadcasting (Scaling)
 import { kafka, TOPICS } from "@repo/kafka";
@@ -116,12 +117,15 @@ io.on("connection", (socket) => {
         "call:initiate",
         async (data: {
             callerId: string;
+            callerMemberId: string;
             callerName: string;
             callerImage: string;
             recipientId: string;
+            recipientMemberId: string;
             recipientName: string;
             recipientImage: string;
             conversationId: string;
+            serverId?: string;
             callType: "video" | "audio";
         }) => {
             try {
@@ -171,18 +175,21 @@ io.on("connection", (socket) => {
                 // Create call data
                 const callId = crypto.randomUUID();
                 const roomName = `call:${data.conversationId}:${callId}`;
-                const callData = {
+                const callData: CallData = {
                     callId,
                     callerId: data.callerId,
+                    callerMemberId: data.callerMemberId,
                     callerName: data.callerName,
                     callerImage: data.callerImage,
                     recipientId: data.recipientId,
+                    recipientMemberId: data.recipientMemberId,
                     recipientName: data.recipientName,
                     recipientImage: data.recipientImage,
                     conversationId: data.conversationId,
+                    serverId: data.serverId,
                     roomName,
                     initiatedAt: Date.now(),
-                    status: "ringing" as const,
+                    status: "ringing",
                 };
 
                 // Store call in Redis
@@ -230,6 +237,7 @@ io.on("connection", (socket) => {
                 io.to(recipientSession.socketId).emit("call:incoming", {
                     callId,
                     callerId: data.callerId,
+                    callerMemberId: data.callerMemberId,
                     callerName: data.callerName,
                     callerImage: data.callerImage,
                     conversationId: data.conversationId,
@@ -241,6 +249,7 @@ io.on("connection", (socket) => {
                 socket.emit("call:ringing", {
                     callId,
                     recipientId: data.recipientId,
+                    recipientMemberId: data.recipientMemberId,
                     recipientName: data.recipientName,
                     initiatedAt: callData.initiatedAt,
                 });
@@ -283,8 +292,12 @@ io.on("connection", (socket) => {
             if (callerSession) {
                 io.to(callerSession.socketId).emit("call:accepted", {
                     callId: data.callId,
-                    roomName: callData.roomName,
                     conversationId: callData.conversationId,
+                    serverId: callData.serverId,
+                    callerId: callData.callerId,
+                    callerMemberId: callData.callerMemberId,
+                    recipientId: callData.recipientId,
+                    recipientMemberId: callData.recipientMemberId,
                 });
             }
 
@@ -293,6 +306,11 @@ io.on("connection", (socket) => {
                 callId: data.callId,
                 roomName: callData.roomName,
                 conversationId: callData.conversationId,
+                serverId: callData.serverId,
+                callerId: callData.callerId,
+                callerMemberId: callData.callerMemberId,
+                recipientId: callData.recipientId,
+                recipientMemberId: callData.recipientMemberId,
             });
 
             console.log(`Call ${data.callId} accepted`);
@@ -393,9 +411,6 @@ io.on("connection", (socket) => {
                 );
                 if (activeCall) {
                     callId = activeCall.callId;
-                    console.log(
-                        `[Socket] Found callId ${callId} for user ${socket.userId}`,
-                    );
                 }
             }
 
@@ -404,7 +419,7 @@ io.on("connection", (socket) => {
                 return;
             }
 
-            // Clear timeout just in case it's still there
+            // Clear timeout
             const timeout = activeCallTimeouts.get(callId);
             if (timeout) {
                 clearTimeout(timeout);
@@ -412,32 +427,32 @@ io.on("connection", (socket) => {
             }
 
             const callData = await sessionManager.getActiveCall(callId);
-            if (!callData) {
-                console.warn(
-                    `[Socket] Call end: Data for ${callId} missing. Cleaning up orphaned state.`,
+            if (callData) {
+                // Notify both parties
+                const callerSession = await sessionManager.getUserSession(
+                    callData.callerId,
                 );
+                if (callerSession) {
+                    io.to(callerSession.socketId).emit("call:ended", {
+                        callId,
+                    });
+                }
+
+                const recipientSession = await sessionManager.getUserSession(
+                    callData.recipientId,
+                );
+                if (recipientSession) {
+                    io.to(recipientSession.socketId).emit("call:ended", {
+                        callId,
+                    });
+                }
+
+                // Clean up call
                 await sessionManager.removeActiveCall(callId);
-                return;
+                console.log(`Call ${callId} ended and cleaned up.`);
+            } else {
+                await sessionManager.removeActiveCall(callId);
             }
-
-            // Notify both parties
-            const callerSession = await sessionManager.getUserSession(
-                callData.callerId,
-            );
-            if (callerSession) {
-                io.to(callerSession.socketId).emit("call:ended", { callId });
-            }
-
-            const recipientSession = await sessionManager.getUserSession(
-                callData.recipientId,
-            );
-            if (recipientSession) {
-                io.to(recipientSession.socketId).emit("call:ended", { callId });
-            }
-
-            // Clean up call
-            await sessionManager.removeActiveCall(callId);
-            console.log(`Call ${callId} ended`);
         } catch (error) {
             console.error("Error ending call:", error);
         }
@@ -448,19 +463,41 @@ io.on("connection", (socket) => {
         console.log(`Disconnected: ${socket.id} (User: ${socket.userId})`);
         if (socket.userId) {
             try {
-                // If user was in a call, we might need to clear timeout
+                // Check if user was in a call
                 const activeCall = await sessionManager.getUserActiveCall(
                     socket.userId,
                 );
+
                 if (activeCall) {
+                    console.log(
+                        `[Socket] User ${socket.userId} disconnected while in call ${activeCall.callId}. Ending call.`,
+                    );
+
                     const timeout = activeCallTimeouts.get(activeCall.callId);
                     if (timeout) {
                         clearTimeout(timeout);
                         activeCallTimeouts.delete(activeCall.callId);
                     }
+
+                    // Notify the OTHER party that the call has ended
+                    const otherUserId =
+                        activeCall.callerId === socket.userId
+                            ? activeCall.recipientId
+                            : activeCall.callerId;
+
+                    const otherSession =
+                        await sessionManager.getUserSession(otherUserId);
+                    if (otherSession) {
+                        io.to(otherSession.socketId).emit("call:ended", {
+                            callId: activeCall.callId,
+                            reason: "peer_disconnected",
+                        });
+                    }
+
+                    // Clean up the call
+                    await sessionManager.removeActiveCall(activeCall.callId);
                 }
 
-                // Automatically end call if user disconnects
                 await sessionManager.removeUserActiveCall(socket.userId);
             } catch (error) {
                 console.error("Error cleaning up call on disconnect:", error);
@@ -485,8 +522,17 @@ async function startConsumer() {
     await consumer.subscribe({ topics: [TOPICS.MESSAGES] });
 
     await consumer.run({
-        eachMessage: async ({ topic, message }: any) => {
+        eachMessage: async ({
+            message,
+            partition,
+        }: {
+            message: any;
+            partition: number;
+        }) => {
             try {
+                console.log(
+                    `[Socket] Received message from partition ${partition}`,
+                );
                 const data = JSON.parse(message.value!.toString());
                 const roomKey = data.channelId
                     ? `chat:${data.channelId}:messages`

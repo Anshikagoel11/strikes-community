@@ -56,7 +56,6 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     useEffect(() => {
         if (socket && userId) {
             socket.emit("identify", { userId, serverId });
-            console.log(`📡 User identified: ${userId}, serverId: ${serverId}`);
         }
     }, [socket, userId, serverId]);
 

@@ -1,5 +1,6 @@
 import { kafka, TOPICS, getProducer } from "@repo/kafka";
 import { prisma } from "@repo/db";
+import { getMessageCache } from "@repo/redis";
 import type { Consumer, EachBatchPayload } from "@repo/kafka";
 
 interface KafkaMessage {
@@ -24,9 +25,6 @@ export class MessageConsumer {
         });
     }
 
-    /**
-     * Connects to Kafka, subscribes to the messages topic, and starts the processing loop.
-     */
     async start() {
         if (this.isRunning) return;
 
@@ -118,9 +116,6 @@ export class MessageConsumer {
         }
     }
 
-    /**
-     * Gracefully stops the consumer and disconnects from Kafka.
-     */
     async stop() {
         if (this.isRunning) {
             await this.consumer.disconnect();
@@ -129,10 +124,6 @@ export class MessageConsumer {
         }
     }
 
-    /**
-     * Processes a batch of messages by splitting them into Channel and Direct messages,
-     * then performing bulk inserts into the database.
-     */
     private async processBatchItems(
         messages: (KafkaMessage & { offset: string })[],
     ) {
@@ -215,6 +206,27 @@ export class MessageConsumer {
             console.log(
                 `✅ Batch persistence complete: ${channelMessages.length} channel msgs, ${directMessages.length} direct msgs. (${duration}ms)`,
             );
+
+            // Invalidate Cache for affected channels/conversations
+            const messageCache = getMessageCache();
+            const invalidatedKeys = new Set<string>();
+
+            for (const msg of channelMessages) {
+                // Invalidate the "initial" page (latest messages)
+                const key = `chat:${msg.channelId}:messages:initial`;
+                if (!invalidatedKeys.has(key)) {
+                    await messageCache.invalidate(key);
+                    invalidatedKeys.add(key);
+                }
+            }
+
+            for (const msg of directMessages) {
+                const key = `chat:${msg.conversationId}:messages:initial`;
+                if (!invalidatedKeys.has(key)) {
+                    await messageCache.invalidate(key);
+                    invalidatedKeys.add(key);
+                }
+            }
         } catch (e) {
             console.error(
                 "❌ Database batch write failed. Initiating recovery...",
@@ -225,7 +237,6 @@ export class MessageConsumer {
             const producer = getProducer();
             try {
                 for (const msg of messages) {
-                    // Remove the Kafka internal offset added by this worker before re-publishing
                     const originalMessage = { ...msg };
                     // @ts-expect-error - offset is injected for batching
                     delete originalMessage.offset;
@@ -243,9 +254,6 @@ export class MessageConsumer {
         }
     }
 
-    /**
-     * Calculates the total lag across all partitions for the monitored topic.
-     */
     async getLag(): Promise<number> {
         const admin = kafka.admin();
         try {
