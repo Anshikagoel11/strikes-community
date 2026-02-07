@@ -51,10 +51,17 @@ const ConversationPage = async (props: ConversationPageProps) => {
                 name={otherMember.profile.name}
                 serverId={serverId}
                 type="conversation"
+                recipientMemberId={otherMember.profile.userId}
+                conversationId={conversation.id}
             />
 
             {searchParams.video && (
-                <MediaRoom chatId={conversation.id} video={true} audio={true} />
+                <MediaRoom
+                    chatId={conversation.id}
+                    video={true}
+                    audio={true}
+                    autoJoin={true}
+                />
             )}
 
             {!searchParams.video && (

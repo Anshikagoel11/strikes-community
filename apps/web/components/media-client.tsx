@@ -1,27 +1,36 @@
 "use client";
 
 import { useUser } from "@clerk/nextjs";
-import { Loader2 } from "lucide-react";
+import { Loader2, Mic, Video } from "lucide-react";
 import { useEffect, useState } from "react";
 import { LiveKitRoom, VideoConference } from "@livekit/components-react";
 import "@livekit/components-styles";
+import { Button } from "@/components/ui/button";
 
 interface MediaRoomProps {
     chatId: string;
     video: boolean;
     audio: boolean;
+    autoJoin?: boolean;
 }
 
-export const MediaRoom = ({ chatId, video, audio }: MediaRoomProps) => {
+export const MediaRoom = ({
+    chatId,
+    video,
+    audio,
+    autoJoin = false,
+}: MediaRoomProps) => {
     const { user } = useUser();
     const [token, setToken] = useState("");
     const [isMounted, setIsMounted] = useState(false);
+    const [joined, setJoined] = useState(autoJoin);
 
     useEffect(() => {
         setIsMounted(true);
     }, []);
 
     useEffect(() => {
+        if (!joined) return;
         if (!user?.id || !user?.firstName || !user?.lastName) return;
 
         const name = `${user.firstName} ${user.lastName}`;
@@ -38,25 +47,62 @@ export const MediaRoom = ({ chatId, video, audio }: MediaRoomProps) => {
             }
         };
         wrapper();
-    }, [user?.id, user?.firstName, user?.lastName, chatId]);
+    }, [user?.id, user?.firstName, user?.lastName, chatId, joined]);
 
-    if (!isMounted || token === "") {
+    if (!isMounted) return null;
+
+    if (!joined) {
+        return (
+            <div className="flex flex-col items-center justify-center flex-1 space-y-4">
+                <div className="p-4 rounded-full bg-primary/10">
+                    {video ? (
+                        <Video className="h-12 w-12 text-primary" />
+                    ) : (
+                        <Mic className="h-12 w-12 text-primary" />
+                    )}
+                </div>
+                <div className="text-center space-y-1">
+                    <h3 className="text-xl font-bold">
+                        {video ? "Video Channel" : "Voice Channel"}
+                    </h3>
+                    <p className="text-muted-foreground text-sm">
+                        Confirm to join this media room
+                    </p>
+                </div>
+                <Button
+                    onClick={() => setJoined(true)}
+                    className="px-8"
+                    size="lg"
+                >
+                    Join Room
+                </Button>
+            </div>
+        );
+    }
+
+    if (token === "") {
         return (
             <div className="flex items-center justify-center flex-1 flex-col">
                 <Loader2 className="h-7 w-7 animate-spin my-4" />
-                <p className="text-xs">Loading...</p>
+                <p className="text-xs font-medium text-muted-foreground">
+                    Joining room...
+                </p>
             </div>
         );
     }
 
     return (
         <LiveKitRoom
-            data-lk-theme="default" // we can set this light and dark.
+            data-lk-theme="default"
             serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL}
             token={token}
             connect={true}
             video={video}
             audio={audio}
+            onDisconnected={() => {
+                setJoined(false);
+                setToken("");
+            }}
         >
             <VideoConference />
         </LiveKitRoom>

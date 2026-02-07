@@ -11,6 +11,8 @@ import InviteModal from "../modals/invite-modal";
 import LeaveServerModal from "../modals/leave-server-modal";
 import MembersModal from "../modals/members-modal";
 import MessageFileModal from "../modals/message-file-modal";
+import { IncomingCallModal } from "../modals/incoming-call-modal";
+import { OutgoingCallModal } from "../modals/outgoing-call-modal";
 
 export const ModalProvider = () => {
     return (
@@ -26,6 +28,8 @@ export const ModalProvider = () => {
             <EditChannelModal />
             <MessageFileModal />
             <DeleteMessageModal />
+            <IncomingCallModal />
+            <OutgoingCallModal />
         </>
     );
 };

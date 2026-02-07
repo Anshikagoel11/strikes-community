@@ -9,9 +9,18 @@ interface ChatHeaderProps {
     name: string;
     type: "channel" | "conversation";
     imageUrl?: string;
+    recipientMemberId?: string;
+    conversationId?: string;
 }
 
-const ChatHeader = ({ serverId, name, type, imageUrl }: ChatHeaderProps) => {
+const ChatHeader = ({
+    serverId,
+    name,
+    type,
+    imageUrl,
+    recipientMemberId,
+    conversationId,
+}: ChatHeaderProps) => {
     return (
         <div className="text-md font-semibold  px-3 flex items-center border-b h-12 bg-secondary border-primary/10">
             <MobileToggle serverId={serverId} />
@@ -27,7 +36,14 @@ const ChatHeader = ({ serverId, name, type, imageUrl }: ChatHeaderProps) => {
             )}
             <p className="font-semibold text-md">{name}</p>
             <div className="ml-auto flex items-center">
-                {type === "conversation" && <ChatVideoButton />}
+                {type === "conversation" && (
+                    <ChatVideoButton
+                        recipientMemberId={recipientMemberId}
+                        recipientName={name}
+                        recipientImageUrl={imageUrl}
+                        conversationId={conversationId}
+                    />
+                )}
                 <SocketIndicator />
             </div>
         </div>
