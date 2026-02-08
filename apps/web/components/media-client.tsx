@@ -30,7 +30,7 @@ export const MediaRoom = ({
     const [joined, setJoined] = useState(autoJoin);
     const router = useRouter();
     const pathname = usePathname();
-    const { resolvedTheme } = useTheme();
+    const { theme } = useTheme();
 
     useEffect(() => {
         setIsMounted(true);
@@ -100,7 +100,7 @@ export const MediaRoom = ({
 
     return (
         <LiveKitRoom
-            data-lk-theme={resolvedTheme === "dark" ? "dark" : "default"}
+            data-lk-theme={theme === "dark" ? "dark" : "default"}
             serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL}
             token={token}
             connect={true}

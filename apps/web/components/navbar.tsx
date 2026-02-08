@@ -39,7 +39,7 @@ export const Navbar = () => {
                             <Button
                                 variant="default"
                                 size="sm"
-                                className="hover:scale-105 transition-transform"
+                                className="hover:scale-105 transition-transform bg-primary-color text-white"
                             >
                                 Profile
                             </Button>
@@ -59,7 +59,7 @@ export const Navbar = () => {
                         <Link href="/sign-up">
                             <Button
                                 size="sm"
-                                className="hover:scale-105 transition-transform"
+                                className="hover:scale-105 transition-transform bg-primary-color text-white"
                             >
                                 Sign Up
                             </Button>
