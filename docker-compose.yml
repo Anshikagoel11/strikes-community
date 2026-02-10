@@ -1,6 +1,7 @@
 services:
     zookeeper:
         image: confluentinc/cp-zookeeper:latest
+        container_name: zookeeper
         environment:
             ZOOKEEPER_CLIENT_PORT: 2181
             ZOOKEEPER_TICK_TIME: 2000
@@ -9,6 +10,7 @@ services:
 
     kafka:
         image: confluentinc/cp-kafka:7.5.0
+        container_name: kafka
         depends_on:
             - zookeeper
         ports:
@@ -20,24 +22,50 @@ services:
             KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
             KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
             KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+        volumes:
+            - kafka:/var/lib/kafka/data
+
+    kafka-ui:
+        image: provectuslabs/kafka-ui:latest
+        container_name: kafka-ui
+        ports:
+            - "8080:8080"
+        environment:
+            KAFKA_CLUSTERS_0_NAME: "local"
+            KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "kafka:29092"
 
     redis:
         image: redis:alpine
+        container_name: redis-session-manager
         ports:
             - "6379:6379"
         command: redis-server --appendonly yes --requirepass ""
+        volumes:
+            - redis:/data
 
     redis-cache:
         image: redis:alpine
+        container_name: redis-messages-cache
         ports:
             - "6380:6379"
         command: redis-server --appendonly yes --requirepass ""
+        volumes:
+            - redis-cache:/data
 
     postgres:
         image: postgres:17-alpine
+        container_name: postgres-sql-db
         environment:
             POSTGRES_USER: postgres
             POSTGRES_PASSWORD: password
             POSTGRES_DB: strikes-community
         ports:
             - "5432:5432"
+        volumes:
+            - postgres:/var/lib/postgresql/data
+
+volumes:
+    postgres:
+    redis:
+    redis-cache:
+    kafka:

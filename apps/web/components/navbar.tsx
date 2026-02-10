@@ -39,7 +39,7 @@ export const Navbar = () => {
                             <Button
                                 variant="default"
                                 size="sm"
-                                className="hover:scale-105 transition-transform bg-primary-color text-white"
+                                className="transition-transform bg-primary-color hover:bg-primary-color/90 text-white cursor-pointer"
                             >
                                 Profile
                             </Button>
