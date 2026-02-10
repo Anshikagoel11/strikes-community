@@ -7,7 +7,9 @@ services:
             ZOOKEEPER_TICK_TIME: 2000
         ports:
             - "2181:2181"
-
+        volumes:
+            - zookeeper-data:/var/lib/zookeeper/data
+            - zookeeper-log:/var/lib/zookeeper/log
     kafka:
         image: confluentinc/cp-kafka:7.5.0
         container_name: kafka
@@ -29,7 +31,7 @@ services:
         image: provectuslabs/kafka-ui:latest
         container_name: kafka-ui
         ports:
-            - "8080:8080"
+            - "8000:8080"
         environment:
             KAFKA_CLUSTERS_0_NAME: "local"
             KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "kafka:29092"
@@ -64,8 +66,38 @@ services:
         volumes:
             - postgres:/var/lib/postgresql/data
 
+    # app:
+    #     image: oven/bun:1
+    #     container_name: strikes-app
+    #     restart: always
+    #     working_dir: /app
+    #     volumes:
+    #         - .:/app
+    #     ports:
+    #         - "3000:3000"
+    #         - "3001:3001"
+    #     env_file: .env
+    #     environment:
+    #         # Overriding .env values
+    #         DATABASE_URL: "postgresql://postgres:password@postgres:5432/strikes-community"
+    #         REDIS_URL: "redis://redis:6379"
+    #         REDIS_CACHE_URL: "redis://redis-cache:6379"
+    #         KAFKA_BROKER: "kafka:29092"
+    #         KAFKA_BOOTSTRAP_SERVERS: "kafka:29092"
+    #         SOCKET_PORT: 3001
+    #         NEXT_PUBLIC_SOCKET_URL: "http://localhost:3001"
+    #         NEXT_PUBLIC_SITE_URL: "http://localhost:3000"
+    #     command: sh -c "bun install && bun x turbo db:generate && bun run dev"
+    #     depends_on:
+    #         - postgres
+    #         - redis
+    #         - redis-cache
+    #         - kafka
+
 volumes:
     postgres:
     redis:
     redis-cache:
     kafka:
+    zookeeper-data:
+    zookeeper-log:

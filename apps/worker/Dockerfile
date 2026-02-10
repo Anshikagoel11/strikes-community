@@ -1,21 +1,17 @@
-FROM oven/bun:1 AS base
-
-# Builder stage
-FROM base AS builder
+FROM oven/bun:1-slim AS builder
 WORKDIR /app
+RUN bun add -g turbo
 COPY . .
-RUN bun install
-RUN bun run build --filter=@repo/worker
+RUN turbo prune @repo/worker --docker
 
-# Runner stage
-FROM base AS runner
+FROM oven/bun:1-slim AS runner
 WORKDIR /app
-COPY --from=builder /app/package.json .\
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/apps/worker/dist ./apps/worker/dist
-COPY --from=builder /app/apps/worker/package.json ./apps/worker/package.json
-# Copy workspace packages that worker depends on
-COPY --from=builder /app/packages ./packages
+COPY --from=builder /app/out/json/ .
+COPY --from=builder /app/out/bun.lock ./bun.lock
+RUN bun install --frozen-lockfile --production
+COPY --from=builder /app/out/full/ .
 
-WORKDIR /app/apps/worker
-CMD ["bun", "run", "dist/index.js"]
+RUN bun turbo db:generate
+
+ENV NODE_ENV=production
+CMD ["bun", "apps/worker/src/index.ts"]

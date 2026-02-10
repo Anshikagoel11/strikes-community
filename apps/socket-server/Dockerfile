@@ -1,22 +1,16 @@
-FROM oven/bun:1 AS base
-
-# Builder stage
-FROM base AS builder
+FROM oven/bun:1-slim AS builder
 WORKDIR /app
+RUN bun add -g turbo
 COPY . .
-RUN bun install
-RUN bun run build --filter=@repo/socket-server
+RUN turbo prune @repo/socket-server --docker
 
-# Runner stage
-FROM base AS runner
+FROM oven/bun:1-slim AS runner
 WORKDIR /app
-COPY --from=builder /app/package.json .
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/apps/socket-server/dist ./apps/socket-server/dist
-COPY --from=builder /app/apps/socket-server/package.json ./apps/socket-server/package.json
-# Copy workspace packages that socket-server depends on
-COPY --from=builder /app/packages ./packages
+COPY --from=builder /app/out/json/ .
+COPY --from=builder /app/out/bun.lock ./bun.lock
+RUN bun install --frozen-lockfile --production
+COPY --from=builder /app/out/full/ .
 
-WORKDIR /app/apps/socket-server
-EXPOSE 3001
-CMD ["bun", "run", "dist/index.js"]
+ENV NODE_ENV=production
+EXPOSE 8080
+CMD ["bun", "apps/socket-server/src/index.ts"]

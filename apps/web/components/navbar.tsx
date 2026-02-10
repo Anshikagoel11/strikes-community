@@ -2,9 +2,17 @@
 
 import { ModeToggle } from "@/components/ModeToggle";
 import { Button } from "@/components/ui/button";
-import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import {
+    ClerkLoading,
+    ClerkLoaded,
+    SignedIn,
+    SignedOut,
+    UserButton,
+} from "@clerk/nextjs";
 import Link from "next/link";
 import { Menu } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -34,62 +42,73 @@ export const Navbar = () => {
 
                 <div className="hidden md:flex items-center gap-4">
                     <ModeToggle />
-                    <SignedIn>
-                        <Link href={`/setup`}>
-                            <Button
-                                variant="default"
-                                size="sm"
-                                className="transition-transform bg-primary-color hover:bg-primary-color/90 text-white cursor-pointer"
-                            >
-                                Profile
-                            </Button>
-                        </Link>
-                        <UserButton />
-                    </SignedIn>
-                    <SignedOut>
-                        <Link href="/sign-in">
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                className="hover:scale-105 transition-transform"
-                            >
-                                Sign In
-                            </Button>
-                        </Link>
-                        <Link href="/sign-up">
-                            <Button
-                                size="sm"
-                                className="hover:scale-105 transition-transform bg-primary-color text-white"
-                            >
-                                Sign Up
-                            </Button>
-                        </Link>
-                    </SignedOut>
+                    <ClerkLoading>
+                        <Skeleton className="h-8 w-20" />
+                        <Skeleton className="h-8 w-8 rounded-full" />
+                    </ClerkLoading>
+                    <ClerkLoaded>
+                        <SignedIn>
+                            <Link href={`/setup`}>
+                                <Button
+                                    variant="default"
+                                    size="sm"
+                                    className="transition-transform bg-primary-color hover:bg-primary-color/90 text-white cursor-pointer"
+                                >
+                                    Profile
+                                </Button>
+                            </Link>
+                            <UserButton />
+                        </SignedIn>
+                        <SignedOut>
+                            <Link href="/sign-in">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="hover:scale-105 transition-transform"
+                                >
+                                    Sign In
+                                </Button>
+                            </Link>
+                            <Link href="/sign-up">
+                                <Button
+                                    size="sm"
+                                    className="hover:scale-105 transition-transform bg-primary-color text-white"
+                                >
+                                    Sign Up
+                                </Button>
+                            </Link>
+                        </SignedOut>
+                    </ClerkLoaded>
                 </div>
 
                 {/* Mobile Menu */}
                 <div className="md:hidden flex items-center gap-2">
                     <ModeToggle />
-                    <SignedIn>
-                        <UserButton />
-                    </SignedIn>
-                    <SignedOut>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="icon">
-                                    <Menu className="h-5 w-5" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem asChild>
-                                    <Link href="/sign-in">Sign In</Link>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem asChild>
-                                    <Link href="/sign-up">Sign Up</Link>
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </SignedOut>
+                    <ClerkLoading>
+                        <Skeleton className="h-8 w-8 rounded-full" />
+                    </ClerkLoading>
+                    <ClerkLoaded>
+                        <SignedIn>
+                            <UserButton />
+                        </SignedIn>
+                        <SignedOut>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" size="icon">
+                                        <Menu className="h-5 w-5" />
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/sign-in">Sign In</Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/sign-up">Sign Up</Link>
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </SignedOut>
+                    </ClerkLoaded>
                 </div>
             </div>
         </nav>

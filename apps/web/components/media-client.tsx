@@ -100,7 +100,7 @@ export const MediaRoom = ({
 
     return (
         <LiveKitRoom
-            data-lk-theme={theme === "dark" ? "dark" : "default"}
+            data-lk-theme={theme === "dark" ? "dark" : "light"}
             serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL}
             token={token}
             connect={true}
@@ -113,7 +113,6 @@ export const MediaRoom = ({
                 console.log("LiveKit Room Disconnected");
                 setJoined(false);
                 setToken("");
-                // endCall(); // Temporarily disabled to debug connection drop
                 const url = qs.stringifyUrl(
                     {
                         url: pathname || "",

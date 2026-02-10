@@ -1,22 +1,23 @@
-FROM oven/bun:1 AS base
-
-# Builder stage
-FROM base AS builder
+FROM oven/bun:1-slim AS builder
 WORKDIR /app
+RUN bun add -g turbo
 COPY . .
-RUN bun install
-RUN bun run build --filter=@repo/web
+RUN turbo prune @repo/web --docker
 
-# Runner stage
-FROM base AS runner
+FROM oven/bun:1-slim AS runner
 WORKDIR /app
-COPY --from=builder /app/package.json .
-COPY --from=builder /app/turbo.json .
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/apps/web/.next/standalone ./
-COPY --from=builder /app/apps/web/.next/static ./apps/web/.next/static
-COPY --from=builder /app/apps/web/public ./apps/web/public
+COPY --from=builder /app/out/json/ .
+COPY --from=builder /app/out/bun.lock ./bun.lock
+RUN bun install --frozen-lockfile
+COPY --from=builder /app/out/full/ .
+RUN bun turbo db:generate && bun turbo build --filter=@repo/web
 
+ENV NODE_ENV=production
+ENV PORT=3000
 EXPOSE 3000
-ENV PORT 3000
-CMD ["node", "apps/web/server.js"]
+
+COPY --from=runner /app/apps/web/public ./apps/web/public
+COPY --from=runner /app/apps/web/.next/standalone ./
+COPY --from=runner /app/apps/web/.next/static ./apps/web/.next/static
+
+CMD ["bun", "apps/web/server.js"]

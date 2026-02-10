@@ -40,7 +40,6 @@ async function runConsumer() {
         console.log("Worker service is active. Press Ctrl+C to stop.\n");
     } catch (error) {
         console.error("CRITICAL: Worker service failed to start:", error);
-        process.exit(1);
     }
 }
 
