@@ -20,7 +20,7 @@ export const ChatAIToggle = () => {
                     "flex items-center justify-center w-8 h-8 rounded-xl mr-2 transition-all duration-200",
                     isAIEnabled
                         ? "bg-linear-to-br from-primary-color to-primary-color/90 text-white shadow-md hover:shadow-lg"
-                        : "bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700",
+                        : "bg-primary-color/20 dark:bg-primary-color/20 hover:bg-primary-color/40 dark:hover:bg-primary-color/40 text-primary-color dark:text-primary-color",
                 )}
             >
                 {isAIEnabled ? (
