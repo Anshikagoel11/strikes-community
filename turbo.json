@@ -18,6 +18,7 @@
         "REDIS_CACHE_URL",
         "KAFKA_BROKER",
         "KAFKA_BOOTSTRAP_SERVERS",
+        "GOOGLE_GEMINI_API_KEY",
         "NODE_ENV"
     ],
     "tasks": {

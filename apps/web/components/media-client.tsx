@@ -5,7 +5,6 @@ import { Loader2, Mic, Video } from "lucide-react";
 import { useEffect, useState } from "react";
 import { LiveKitRoom, VideoConference } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { useCall } from "@/hooks/use-call";
 import { Button } from "@/components/ui/button";
 import { useRouter, usePathname } from "next/navigation";
 import qs from "query-string";
