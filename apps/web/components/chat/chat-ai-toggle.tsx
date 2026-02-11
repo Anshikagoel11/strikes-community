@@ -26,7 +26,7 @@ export const ChatAIToggle = () => {
                 {isAIEnabled ? (
                     <Sparkles className="w-5 h-5 fill-current" />
                 ) : (
-                    <Sparkle className="w-5 h-5" />
+                    <Sparkle className="w-5 h-5 fill-primary-color" />
                 )}
             </button>
         </ActionTooltip>
