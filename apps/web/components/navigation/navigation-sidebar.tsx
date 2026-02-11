@@ -30,22 +30,22 @@ const NavigationSidebar = async () => {
     return (
         <nav
             aria-label="Server sidebar"
-            className="flex flex-col items-center h-full text-primary bg-secondary py-3 border-r"
+            className="flex flex-col items-center h-full text-primary bg-secondary/80 backdrop-blur-sm py-4 border-r border-primary/5"
         >
-            <div className="flex flex-col items-center w-full space-y-4">
+            <div className="flex flex-col items-center w-full space-y-4 mb-2">
                 <NavigationAction />
-                <Separator className="bg-muted-foreground/20 rounded-md w-10 mx-auto mb-2" />
+                <Separator className="bg-primary/10 rounded-full w-10 mx-auto" />
             </div>
 
             <ScrollArea className="flex-1 w-full">
-                <ul className="flex flex-col items-center gap-2 py-2">
+                <ul className="flex flex-col items-center gap-y-3 py-2">
                     {servers.length === 0 ? (
-                        <li className="text-xs text-muted-foreground px-2 text-center">
+                        <li className="text-[10px] font-medium uppercase text-muted-foreground/60 px-2 text-center mt-4">
                             No servers
                         </li>
                     ) : (
                         servers.map((server) => (
-                            <li key={server.id} className="mb-0">
+                            <li key={server.id} className="w-full">
                                 <NavigationItems
                                     id={server.id}
                                     name={server.name}
@@ -57,20 +57,29 @@ const NavigationSidebar = async () => {
                 </ul>
             </ScrollArea>
 
-            <div className="w-full">
-                <Separator className="bg-muted-foreground/20 rounded-md w-10 mx-auto" />
-                <div className="mt-2 flex items-center flex-col gap-y-3">
+            <div className="w-full space-y-4 mt-auto flex flex-col items-center">
+                <Separator className="bg-primary/10 rounded-full w-10 mx-auto" />
+                <div className="flex items-center flex-col gap-y-4 w-full">
                     <ModeToggle />
 
-                    <Button variant="outline" size="icon" asChild>
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        asChild
+                        className="hover:bg-primary/5 rounded-2xl transition-all active:scale-90 opacity-80 hover:opacity-100"
+                    >
                         <Link href="/">
-                            <HomeIcon className="h-[1.2rem] w-[1.2rem] scale-100" />
+                            <HomeIcon className="h-5 w-5 " />
                         </Link>
                     </Button>
 
-                    <div className="w-full flex justify-center">
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        className="hover:bg-primary/5 rounded-2xl transition-all active:scale-90 opacity-80 hover:opacity-100"
+                    >
                         <ClerkUserButton />
-                    </div>
+                    </Button>
                 </div>
             </div>
         </nav>

@@ -2,9 +2,48 @@
 
 import { useSocket } from "./providers/socket-provider";
 import { Badge } from "./ui/badge";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
-export const SocketIndicator = () => {
+interface SocketIndicatorProps {
+    recipientUserId?: string;
+}
+
+export const SocketIndicator = ({ recipientUserId }: SocketIndicatorProps) => {
     const { isConnected } = useSocket();
+
+    const { data } = useQuery({
+        queryKey: ["user-status", recipientUserId],
+        queryFn: async () => {
+            const res = await axios.get(`/api/users/${recipientUserId}/status`);
+            return res.data as { isLive: boolean };
+        },
+        enabled: !!recipientUserId,
+        refetchInterval: 10000, // Refetch every 10s for production readiness
+    });
+
+    if (recipientUserId) {
+        if (data?.isLive) {
+            return (
+                <Badge
+                    variant={"outline"}
+                    className="bg-primary-color text-white border-none"
+                >
+                    Live
+                </Badge>
+            );
+        }
+
+        return (
+            <Badge
+                variant={"outline"}
+                className="bg-gray-500 text-white border-none"
+            >
+                Offline
+            </Badge>
+        );
+    }
+
     if (!isConnected) {
         return (
             <Badge
@@ -15,6 +54,7 @@ export const SocketIndicator = () => {
             </Badge>
         );
     }
+
     return (
         <Badge
             variant={"outline"}

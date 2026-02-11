@@ -51,7 +51,11 @@ const ChatHeader = ({
                         serverId={serverId}
                     />
                 )}
-                <SocketIndicator />
+                <SocketIndicator
+                    recipientUserId={
+                        type === "conversation" ? recipientUserId : undefined
+                    }
+                />
             </div>
         </div>
     );

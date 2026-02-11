@@ -23,23 +23,29 @@ const NavigationItems = ({ id, imageUrl, name }: navigationItemProps) => {
         <ActionTooltip side="right" align="center" label={name}>
             <button
                 onClick={onClick}
-                className="group relative flex items-center"
+                className="group relative flex items-center transition-all active:scale-95 w-full"
             >
                 <div
                     className={cn(
                         "absolute left-0 bg-primary rounded-r-full transition-all w-1",
                         params?.serverId !== id && "group-hover:h-5",
-                        params?.serverId === id ? "h-9" : "h-1",
+                        params?.serverId === id ? "h-9" : "h-0",
                     )}
                 />
                 <div
                     className={cn(
-                        "relative group flex mx-4 h-10 w-10 rounded-[24px] group-hover:rounded-3xl transition-all overflow-hidden border border-primary/10",
+                        "relative group flex mx-auto h-12 w-12 rounded-[24px] group-hover:rounded-3xl transition-all overflow-hidden border border-primary/10 cursor-pointer",
                         params?.serverId === id &&
-                            "bg-primary/10 text-primary rounded-3xl",
+                            "bg-primary/10 text-primary rounded-3xl shadow-lg shadow-primary/5 border-primary/20",
                     )}
                 >
-                    <Image fill src={imageUrl} alt="Channel" unoptimized />
+                    <Image
+                        fill
+                        src={imageUrl}
+                        alt="Server"
+                        unoptimized
+                        className="transition-transform group-hover:scale-110 object-cover"
+                    />
                 </div>
             </button>
         </ActionTooltip>
