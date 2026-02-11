@@ -9,6 +9,7 @@ import qs from "query-string";
 import axios from "axios";
 import { useModal } from "@/hooks/use-mode-store";
 import EmojiPicker from "../emoji-picker";
+import { cn } from "@/lib/utils";
 
 interface ChatInputProps {
     apiUrl: string;
@@ -56,45 +57,53 @@ const ChatInput = ({ apiUrl, query, name, type }: ChatInputProps) => {
                     render={({ field }) => (
                         <FormItem className="w-full">
                             <FormControl>
-                                <div className="relative flex items-center gap-2 w-full">
-                                    <button
-                                        type="button"
-                                        className="h-10 w-10 rounded-md bg-card flex items-center justify-center hover:bg-zinc-200 dark:hover:bg-zinc-700 transition border"
-                                        onClick={() =>
-                                            onOpen("messageFile", {
-                                                apiUrl,
-                                                query,
-                                            })
-                                        }
-                                    >
-                                        <Plus className="text-zinc-500 dark:text-zinc-400" />
-                                    </button>
-                                    <input
-                                        type="text"
-                                        className="bg-card p-2 rounded-md h-10 w-full text-zinc-600 dark:text-zinc-200 border"
-                                        placeholder={`Message ${type === "conversation" ? name : "#" + name}`}
-                                        {...field}
-                                        disabled={isLoading}
-                                        autoComplete="off"
-                                    />
-                                    <button
-                                        type="submit"
-                                        disabled={isLoading}
-                                        className="absolute h-8 w-8 right-13 flex items-center justify-center rounded-md cursor-pointer hover:bg-zinc-300/10 transition text-zinc-500 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300"
-                                    >
-                                        {isLoading ? (
-                                            <Loader2 className="h-5 w-5 animate-spin" />
-                                        ) : (
-                                            <Send className="h-5 w-5" />
-                                        )}
-                                    </button>
-                                    <EmojiPicker
-                                        onChange={(emoji: string) =>
-                                            field.onChange(
-                                                `${field.value} ${emoji}`,
-                                            )
-                                        }
-                                    />
+                                <div className="relative group">
+                                    <div className="relative flex items-center gap-x-3 bg-primary-foreground p-2 rounded-[1.5rem] border border-zinc-200 dark:border-zinc-800 transition-all focus-within:ring-2 focus-within:ring-primary-color/20 focus-within:bg-white dark:focus-within:bg-zinc-900">
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                onOpen("messageFile", {
+                                                    apiUrl,
+                                                    query,
+                                                })
+                                            }
+                                            className="h-9 w-9 flex items-center justify-center rounded-full bg-zinc-200/50 dark:bg-zinc-700/50 hover:bg-primary-color hover:text-white dark:hover:bg-primary-color transition-all duration-300 text-zinc-500 dark:text-zinc-400 group/upload"
+                                        >
+                                            <Plus className="h-5 w-5 transition-transform group-hover/upload:rotate-90" />
+                                        </button>
+                                        <input
+                                            type="text"
+                                            autoComplete="off"
+                                            disabled={isLoading}
+                                            className="flex-1 bg-transparent border-none focus:ring-0 text-lg px-1 dark:text-zinc-200 outline-none placeholder:text-zinc-500 dark:placeholder:text-zinc-400"
+                                            placeholder={`Message ${type === "conversation" ? name : "#" + name}`}
+                                            {...field}
+                                        />
+                                        <div className="flex items-center gap-x-2 pr-1">
+                                            {field.value?.trim() && (
+                                                <button
+                                                    type="submit"
+                                                    disabled={isLoading}
+                                                    className={cn(
+                                                        "h-9 w-9 flex items-center justify-center rounded-full transition-all duration-300 bg-primary-color text-white shadow-lg shadow-primary-color/20 active:scale-90",
+                                                    )}
+                                                >
+                                                    {isLoading ? (
+                                                        <Loader2 className="h-5 w-5 animate-spin" />
+                                                    ) : (
+                                                        <Send className="h-4 w-4" />
+                                                    )}
+                                                </button>
+                                            )}
+                                            <EmojiPicker
+                                                onChange={(emoji: string) =>
+                                                    field.onChange(
+                                                        `${field.value}${emoji}`,
+                                                    )
+                                                }
+                                            />
+                                        </div>
+                                    </div>
                                 </div>
                             </FormControl>
                         </FormItem>

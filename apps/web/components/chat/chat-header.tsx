@@ -3,6 +3,7 @@ import MobileToggle from "../mobile-toggle";
 import UserAvatar from "../user-avatar";
 import { SocketIndicator } from "../socket-indicator";
 import { ChatVideoButton } from "./chat-video-button";
+import { ChatAIToggle } from "./chat-ai-toggle";
 
 interface ChatHeaderProps {
     serverId: string;
@@ -13,6 +14,7 @@ interface ChatHeaderProps {
     recipientUserId?: string;
     recipientMemberId?: string;
     conversationId?: string;
+    channelType?: "TEXT" | "AUDIO" | "VIDEO";
 }
 
 const ChatHeader = ({
@@ -24,6 +26,7 @@ const ChatHeader = ({
     recipientUserId,
     recipientMemberId,
     conversationId,
+    channelType,
 }: ChatHeaderProps) => {
     return (
         <div className="text-md font-semibold  px-3 flex items-center border-b h-12 bg-secondary border-primary/10">
@@ -50,6 +53,10 @@ const ChatHeader = ({
                         conversationId={conversationId}
                         serverId={serverId}
                     />
+                )}
+                {/* enable ai for TEXT channel chats only */}
+                {type === "channel" && channelType === "TEXT" && (
+                    <ChatAIToggle />
                 )}
                 <SocketIndicator
                     recipientUserId={

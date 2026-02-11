@@ -34,7 +34,7 @@ const ServerHeader = ({
     return (
         <DropdownMenu>
             <DropdownMenuTrigger className="focus:outline-none" asChild>
-                <button className="w-full text-md font-semibold px-3 flex items-center h-12 border-b border-primary/10 transition group bg-secondary hover:bg-white cursor-pointer">
+                <button className="w-full text-md font-semibold px-3 flex items-center h-12 border-b border-primary/10 group bg-secondary hover:bg-secondary/10 cursor-pointer">
                     <span className="truncate">{server.name}</span>
                     <ChevronDown className="h-5 w-5 ml-auto transition-transform group-hover:rotate-180 md:group-data-[state=open]:hidden" />
                 </button>

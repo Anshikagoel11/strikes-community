@@ -1,6 +1,7 @@
 import ChatHeader from "@/components/chat/chat-header";
 import ChatInput from "@/components/chat/chat-input";
 import ChatMessages from "@/components/chat/chat-messages";
+import { ChatContentWrapper } from "@/components/chat/chat-content-wrapper";
 import { MediaRoom } from "@/components/media-client";
 import { getOrCreateConversation } from "@/lib/conversation";
 import { CurrentProfile } from "@/lib/current-profile";
@@ -71,7 +72,7 @@ const ConversationPage = async (props: ConversationPageProps) => {
             )}
 
             {!searchParams.video && (
-                <>
+                <ChatContentWrapper>
                     <div className="flex-1 overflow-y-auto">
                         <ChatMessages
                             member={currentMember}
@@ -96,7 +97,7 @@ const ConversationPage = async (props: ConversationPageProps) => {
                             }}
                         />
                     </div>
-                </>
+                </ChatContentWrapper>
             )}
         </div>
     );

@@ -36,10 +36,8 @@ export const ChatVideoButton = ({
 
     const onClick = () => {
         if (isVideo) {
-            // End call via socket to clear Redis state
             endCall();
 
-            // Navigate back to chat
             const url = qs.stringifyUrl(
                 {
                     url: pathname || "",
@@ -85,9 +83,9 @@ export const ChatVideoButton = ({
         <ActionTooltip side="bottom" label={toolTipLabel}>
             <button
                 onClick={onClick}
-                className="hover:opacity-75 transition mr-4"
+                className="flex items-center justify-center w-8 h-8 rounded-xl mr-2 transition-all duration-200 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700"
             >
-                <Icon className="h-6 w-6" />
+                <Icon className="w-5 h-5" />
             </button>
         </ActionTooltip>
     );

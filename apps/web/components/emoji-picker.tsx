@@ -18,9 +18,9 @@ const EmojiPicker = ({ onChange }: EmojiPickerProps) => {
             <PopoverTrigger asChild>
                 <button
                     type="button"
-                    className="h-10 w-10 rounded-md bg-card flex items-center justify-center hover:bg-zinc-200 dark:hover:bg-zinc-700 transition border"
+                    className="h-9 w-9 flex items-center justify-center rounded-full bg-zinc-200/50 dark:bg-zinc-700/50 hover:bg-zinc-300 dark:hover:bg-zinc-600 transition-all duration-300 text-zinc-500 dark:text-zinc-400"
                 >
-                    <Smile className="text-zinc-500 dark:text-zinc-400" />
+                    <Smile className="h-5 w-5" />
                 </button>
             </PopoverTrigger>
             <PopoverContent

@@ -1,9 +1,10 @@
 "use client";
 
 import { useSocket } from "./providers/socket-provider";
-import { Badge } from "./ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { Wifi, WifiOff, Radio } from "lucide-react";
+import ActionTooltip from "./action-tooltip";
 
 interface SocketIndicatorProps {
     recipientUserId?: string;
@@ -19,48 +20,46 @@ export const SocketIndicator = ({ recipientUserId }: SocketIndicatorProps) => {
             return res.data as { isLive: boolean };
         },
         enabled: !!recipientUserId,
-        refetchInterval: 10000, // Refetch every 10s for production readiness
+        refetchInterval: 10000,
     });
 
+    // User status indicator (for conversations)
     if (recipientUserId) {
         if (data?.isLive) {
             return (
-                <Badge
-                    variant={"outline"}
-                    className="bg-primary-color text-white border-none"
-                >
-                    Live
-                </Badge>
+                <ActionTooltip side="bottom" label="Online">
+                    <div className="flex items-center justify-center w-8 h-8 rounded-xl mr-2 bg-emerald-500/10 dark:bg-emerald-500/20">
+                        <Radio className="w-5 h-5 text-emerald-600 dark:text-emerald-500 animate-pulse" />
+                    </div>
+                </ActionTooltip>
             );
         }
 
         return (
-            <Badge
-                variant={"outline"}
-                className="bg-gray-500 text-white border-none"
-            >
-                Offline
-            </Badge>
+            <ActionTooltip side="bottom" label="Offline">
+                <div className="flex items-center justify-center w-8 h-8 rounded-xl mr-2 bg-zinc-100 dark:bg-zinc-800">
+                    <Radio className="w-5 h-5 text-zinc-500 dark:text-zinc-500" />
+                </div>
+            </ActionTooltip>
         );
     }
 
+    // Socket connection indicator (for channels)
     if (!isConnected) {
         return (
-            <Badge
-                variant={"outline"}
-                className="bg-yellow-600 text-white border-none"
-            >
-                Fallback: Polling in every 1s
-            </Badge>
+            <ActionTooltip side="bottom" label="Reconnecting">
+                <div className="flex items-center justify-center w-8 h-8 rounded-xl mr-2 bg-amber-500/10 dark:bg-amber-500/20">
+                    <WifiOff className="w-5 h-5 text-amber-600 dark:text-amber-500 animate-pulse" />
+                </div>
+            </ActionTooltip>
         );
     }
 
     return (
-        <Badge
-            variant={"outline"}
-            className="bg-primary-color text-white border-none"
-        >
-            Live
-        </Badge>
+        <ActionTooltip side="bottom" label="Connected">
+            <div className="flex items-center justify-center w-8 h-8 rounded-xl mr-2 bg-emerald-500/10 dark:bg-emerald-500/20">
+                <Wifi className="w-5 h-5 text-emerald-600 dark:text-emerald-500" />
+            </div>
+        </ActionTooltip>
     );
 };

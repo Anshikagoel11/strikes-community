@@ -1,6 +1,7 @@
 import ChatHeader from "@/components/chat/chat-header";
 import ChatInput from "@/components/chat/chat-input";
 import ChatMessages from "@/components/chat/chat-messages";
+import { ChatContentWrapper } from "@/components/chat/chat-content-wrapper";
 import { MediaRoom } from "@/components/media-client";
 import { CurrentProfile } from "@/lib/current-profile";
 import { prisma } from "@repo/db";
@@ -39,9 +40,10 @@ const ChannelPage = async ({
                 name={channel.name}
                 serverId={channel.serverId}
                 type="channel"
+                channelType={channel.type}
             />
             {channel.type === "TEXT" && (
-                <>
+                <ChatContentWrapper>
                     <div className="flex-1 overflow-y-auto">
                         <ChatMessages
                             member={member}
@@ -69,7 +71,7 @@ const ChannelPage = async ({
                             }}
                         />
                     </div>
-                </>
+                </ChatContentWrapper>
             )}
 
             {channel.type === "AUDIO" && (
