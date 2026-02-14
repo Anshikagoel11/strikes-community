@@ -15,12 +15,10 @@
         "db:migrate": "turbo db:migrate",
         "db:migrate_dev": "turbo db:migrate_dev",
         "db:studio": "turbo db:studio",
-        "db:push": "turbo db:push",
-        "prepare": "husky"
+        "db:push": "turbo db:push"
     },
     "devDependencies": {
         "eslint": "^9.0.0",
-        "husky": "^9.1.7",
         "lint-staged": "^15.2.10",
         "prettier": "^3.0.0",
         "turbo": "latest",

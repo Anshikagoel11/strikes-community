@@ -8,7 +8,7 @@ FROM oven/bun:1-slim AS runner
 WORKDIR /app
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/bun.lock ./bun.lock
-RUN bun install --frozen-lockfile --production
+RUN bun install
 COPY --from=builder /app/out/full/ .
 
 RUN bun turbo db:generate
