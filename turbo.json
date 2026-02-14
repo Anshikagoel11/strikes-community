@@ -23,7 +23,7 @@
     ],
     "tasks": {
         "build": {
-            "dependsOn": ["^build"],
+            "dependsOn": ["^build", "db:generate"],
             "inputs": ["$TURBO_DEFAULT$", ".env*"],
             "outputs": [".next/**", "!.next/cache/**", "dist/**"]
         },
@@ -36,6 +36,10 @@
         },
         "db:generate": {
             "cache": false,
+            "outputs": [
+                "node_modules/.prisma/**",
+                "packages/db/node_modules/.prisma/**"
+            ],
             "env": ["DATABASE_URL"]
         },
         "db:push": {
