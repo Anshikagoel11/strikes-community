@@ -6,7 +6,7 @@
 
 ## Project Demo
 
-https://github.com/user-attachments/assets/3c878653-6de9-4d44-b264-da32c0b494a7
+https://github.com/user-attachments/assets/45c769df-bcfb-44cf-9afc-b36fddc4bd08
 
 ## Project Architecture
 
