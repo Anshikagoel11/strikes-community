@@ -233,6 +233,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Links
 
-- [📖 Full Documentation](https://www.notion.so/arbazansari/2e623f37737480f79067ea159894c7cb)
+- [📖 Full Documentation](https://www.notion.so/Discord-Strikes-Presentation-30bf30df1f91818c97edeb0c4e4c016a)
 - [🐛 Report Bug](https://github.com/ErArbazAnsari/strikes-community/issues)
 - [✨ Request Feature](https://github.com/ErArbazAnsari/strikes-community/issues)
